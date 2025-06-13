@@ -17,6 +17,11 @@ class Program
         }
 
         var service = new BookwormService();
+        ManageCommand(args, service);
+    }
+
+    static void ManageCommand(string[] args, BookwormService service)
+    {
         var command = args[0].ToLowerInvariant();
 
         switch (command)
@@ -26,28 +31,26 @@ class Program
                 {
                     Helper.ShowMessage(MessageType.Error
                     , ["Insufficient parameters for 'add' command."]);
-                    return;
+                    break;
                 }
-                service.AddBook(new Book
-                {
-                    Title = args[1],
-                    Library = int.Parse(args[2]),
-                    Shelf = int.Parse(args[3]),
-                    Order = int.Parse(args[4])
-                });
+                service.AddBook(args[1],
+                    args[2],
+                    args[3],
+                    args[4]
+                );
                 break;
             case "remove":
                 if (args.Length < 2)
                 {
                     Helper.ShowMessage(MessageType.Error
                     , ["Insufficient parameters for 'remove' command."]);
-                    return;
+                    break;
                 }
                 service.RemoveBook(args[1]);
                 break;
             case "list":
                 var books = service.ListBooks();
-                if (books.Count() == 0)
+                if (!books.Any())
                 {
                     Helper.ShowMessage(MessageType.Info, ["No books found."]);
                 }
