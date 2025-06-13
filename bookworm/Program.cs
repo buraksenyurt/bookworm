@@ -1,6 +1,9 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Builder;
+using System.CommandLine.Hosting;
 using System.CommandLine.Parsing;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace bookworm;
 
@@ -8,6 +11,9 @@ class Program
 {
     static async Task<int> Main(string[] args)
     {
+        AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
+        Console.CancelKeyPress += (s, e) => Log.CloseAndFlush();
+
         var rootCmd = new RootCommand(Constants.AppDescription)
         {
             Name = Constants.AppName,
@@ -124,6 +130,21 @@ class Program
         importCommand.SetHandler(async (token) => await Commands.OnHandleImportCommand(token), importFileOption);
 
         var parser = new CommandLineBuilder(rootCmd)
+            .UseHost(_ => Host.CreateDefaultBuilder(), host =>
+            {
+                host.ConfigureServices(services =>
+                {
+                    services.AddSerilog(config =>
+                    {
+                        config.MinimumLevel.Information();
+                        config.WriteTo.Console();
+                        config.WriteTo.File(
+                            "logs/bookworm.log",
+                            rollingInterval: RollingInterval.Day,
+                            restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error);
+                    });
+                });
+            })
             .UseDefaults()
             .Build();
 

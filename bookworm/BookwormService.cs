@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Serilog;
 
 namespace bookworm;
 
@@ -10,6 +11,7 @@ public class BookwormService
     {
         if (_books.Any(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase)))
         {
+            Log.Warning("A book with the title '{Title}' already exists.", title);
             Helper.ShowMessage(MessageType.Warning, ["A book with this title already exists."]);
             return;
         }
@@ -41,11 +43,13 @@ public class BookwormService
         var bookToRemove = _books.FirstOrDefault(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
         if (bookToRemove == null)
         {
+            Log.Warning("No book found with the title '{Title}'.", title);
             Helper.ShowMessage(MessageType.Warning, ["No book found with the specified title."]);
             return;
         }
 
         _books.Remove(bookToRemove);
+        Log.Information("Book '{Title}' removed successfully.", title);
         Helper.ShowMessage(MessageType.Info, ["Book removed successfully."]);
     }
 
@@ -62,6 +66,7 @@ public class BookwormService
 
         if (importedBooks == null || importedBooks.Count == 0)
         {
+            Log.Warning("No books found in the file '{FileName}'.", fileName);
             Helper.ShowMessage(MessageType.Warning, ["No books found in the file."]);
             return;
         }
