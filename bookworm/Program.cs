@@ -9,8 +9,9 @@ class Program
     private static readonly BookwormService _bookwormService = new();
     static async Task<int> Main(string[] args)
     {
-        var rootCmd = new RootCommand("Bookworm CLI - Manage your book collection")
+        var rootCmd = new RootCommand(Constants.AppDescription)
         {
+            Name = Constants.AppName,
         };
 
         var addCommand = new Command("add", "Add a new book")
@@ -20,16 +21,36 @@ class Program
         var titleOption = new Option<string>(
             ["--title", "-t"],
             "The title of the book to add"
-        );
-        titleOption.IsRequired = true;
+        )
+        {
+            IsRequired = true
+        };
+        titleOption.AddValidator(result =>
+        {
+            var title = result.GetValueForOption(titleOption);
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                result.ErrorMessage = "Title cannot be null or empty.";
+            }
+            else if (title.Length > 50)
+            {
+                result.ErrorMessage = "Title cannot exceed 50 characters.";
+            }
+        });
         addCommand.AddOption(titleOption);
         var categoryOption = new Option<string>(
             ["--category", "-c"],
             "The category of the book (optional)"
         )
         {
-            IsRequired = false
+            IsRequired = false,
         };
+
+        categoryOption.SetDefaultValue("Uncategorized");
+        categoryOption.FromAmong(Constants.Categories);
+        categoryOption.AllowMultipleArgumentsPerToken = true;
+        categoryOption.AddCompletions(Constants.Categories);
+
         addCommand.AddOption(categoryOption);
         var readOption = new Option<bool>(
             ["--read", "-r"],
@@ -73,6 +94,44 @@ class Program
         );
         removeCommand.AddOption(removeTitleOption);
         removeCommand.SetHandler(_bookwormService.RemoveBook, removeTitleOption);
+
+        var exportCommand = new Command("export", "Export books to a file")
+        {
+        };
+        rootCmd.AddCommand(exportCommand);
+        var exportFileOption = new Option<string>(
+            ["--file", "-f"],
+            "The file path to export the books to"
+        )
+        {
+            IsRequired = false
+        };
+        exportFileOption.AddValidator(result =>
+        {
+            var filePath = result.GetValueForOption(exportFileOption);
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                result.ErrorMessage = "File path cannot be null or empty.";
+            }
+            else if (!filePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                result.ErrorMessage = "File must have a .json extension.";
+            }
+        });
+        exportCommand.AddOption(exportFileOption);
+        exportCommand.SetHandler(async (filePath) =>
+        {
+            try
+            {
+                await _bookwormService.ExportBooksAsync(filePath);
+                Helper.ShowMessage(MessageType.Info, ["Books exported successfully."]);
+            }
+            catch (Exception ex)
+            {
+                Helper.ShowMessage(MessageType.Error, [ex.Message]);
+            }
+        }, exportFileOption);
+        
 
         var parser = new CommandLineBuilder(rootCmd)
             .UseDefaults()

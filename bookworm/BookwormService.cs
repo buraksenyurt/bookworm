@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace bookworm;
 
 public class BookwormService
@@ -58,5 +60,19 @@ public class BookwormService
 
         _books.Remove(bookToRemove);
         Helper.ShowMessage(MessageType.Info, ["Book removed successfully."]);
+    }
+
+    public async Task ExportBooksAsync(string fileName)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(_books);
+            await File.WriteAllTextAsync(fileName, json);
+        }
+        catch (Exception ex)
+        {
+            Helper.ShowMessage(MessageType.Error, [ex.Message]);
+        }
+        
     }
 }
