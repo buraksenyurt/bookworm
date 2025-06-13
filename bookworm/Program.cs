@@ -6,7 +6,6 @@ namespace bookworm;
 
 class Program
 {
-    private static readonly BookwormService _bookwormService = new();
     static async Task<int> Main(string[] args)
     {
         var rootCmd = new RootCommand(Constants.AppDescription)
@@ -106,7 +105,7 @@ class Program
             }
         });
         exportCommand.AddOption(exportFileOption);
-        exportCommand.SetHandler(Commands.OnHandleExportCommand, exportFileOption);
+        exportCommand.SetHandler(async (token) => await Commands.OnHandleExportCommand(token), exportFileOption);
 
         var importCommand = new Command("import", "Import books from a file")
         {
@@ -122,7 +121,7 @@ class Program
         importFileOption.LegalFileNamesOnly();
         importFileOption.SetDefaultValue("books.json");
         importCommand.AddOption(importFileOption);
-        importCommand.SetHandler(Commands.OnHandleImportCommand, importFileOption);
+        importCommand.SetHandler(async (token) => await Commands.OnHandleImportCommand(token), importFileOption);
 
         var parser = new CommandLineBuilder(rootCmd)
             .UseDefaults()

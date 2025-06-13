@@ -49,15 +49,15 @@ public class BookwormService
         Helper.ShowMessage(MessageType.Info, ["Book removed successfully."]);
     }
 
-    public async Task ExportBooksAsync(string fileName)
+    public async Task ExportBooksAsync(string fileName, CancellationToken cancellationToken)
     {
         var json = JsonSerializer.Serialize(_books);
-        await File.WriteAllTextAsync(fileName, json);
+        await File.WriteAllTextAsync(fileName, json, cancellationToken);
     }
 
-    public async Task ImportBooksAsync(string fileName)
+    public async Task ImportBooksAsync(string fileName, CancellationToken cancellationToken)
     {
-        var json = await File.ReadAllTextAsync(fileName);
+        var json = await File.ReadAllTextAsync(fileName, cancellationToken);
         var importedBooks = JsonSerializer.Deserialize<List<Book>>(json);
 
         if (importedBooks == null || importedBooks.Count == 0)
@@ -70,5 +70,5 @@ public class BookwormService
         {
             AddBook(book.Title, book.Category, book.Read);
         }
-    }    
+    }
 }

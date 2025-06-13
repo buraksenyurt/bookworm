@@ -49,11 +49,11 @@ public static class Commands
         }
     }
 
-    public static async Task OnHandleExportCommand(string filePath)
+    public static async Task OnHandleExportCommand(string filePath, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _bookwormService.ExportBooksAsync(filePath);
+            await _bookwormService.ExportBooksAsync(filePath, cancellationToken);
             Helper.ShowMessage(MessageType.Info, ["Books exported successfully."]);
         }
         catch (Exception ex)
@@ -62,11 +62,11 @@ public static class Commands
         }
     }
 
-    public static async Task OnHandleImportCommand(string filePath)
+    public static async Task OnHandleImportCommand(string filePath, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _bookwormService.ImportBooksAsync(filePath);
+            await _bookwormService.ImportBooksAsync(filePath, cancellationToken);
             Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
         }
         catch (Exception ex)
