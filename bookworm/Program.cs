@@ -22,17 +22,17 @@ class Program
             "The title of the book to add"
         );
         addCommand.AddOption(titleOption);
-        var libraryOption = new Option<string>(
+        var libraryOption = new Option<uint>(
             ["--library", "-l"],
             "The library ID where the book is located"
         );
         addCommand.AddOption(libraryOption);
-        var shelfOption = new Option<string>(
+        var shelfOption = new Option<uint>(
             ["--shelf", "-s"],
             "The shelf ID where the book is located"
         );
         addCommand.AddOption(shelfOption);
-        var orderOption = new Option<string>(
+        var orderOption = new Option<uint>(
             ["--order", "-o"],
             "The order ID of the book on the shelf"
         );

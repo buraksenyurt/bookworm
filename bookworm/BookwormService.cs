@@ -4,29 +4,11 @@ public class BookwormService
 {
     private readonly List<Book> _books = [];
 
-    public void AddBook(string title, string library, string shelf, string order)
+    public void AddBook(string title, uint library, uint shelf, uint order)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
             Helper.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
-            return;
-        }
-
-        if (!int.TryParse(library, out var libraryId))
-        {
-            Helper.ShowMessage(MessageType.Error, ["Invalid library ID."]);
-            return;
-        }
-
-        if (!int.TryParse(shelf, out var shelfId))
-        {
-            Helper.ShowMessage(MessageType.Error, ["Invalid shelf ID."]);
-            return;
-        }
-
-        if (!int.TryParse(order, out var orderId))
-        {
-            Helper.ShowMessage(MessageType.Error, ["Invalid order ID."]);
             return;
         }
 
@@ -39,9 +21,9 @@ public class BookwormService
         var book = new Book
         {
             Title = title,
-            Library = libraryId,
-            Shelf = shelfId,
-            Order = orderId
+            Library = library,
+            Shelf = shelf,
+            Order = order
         };
 
         _books.Add(book);

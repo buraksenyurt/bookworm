@@ -16,7 +16,7 @@ public static class Helper
         switch (messageType)
         {
             case MessageType.Info:
-                newColor = ConsoleColor.Red;
+                newColor = ConsoleColor.Green;
                 prefix = "Info";
                 break;
             case MessageType.Warning:
@@ -24,7 +24,7 @@ public static class Helper
                 prefix = "Warning";
                 break;
             case MessageType.Error:
-                newColor = ConsoleColor.Green;
+                newColor = ConsoleColor.Red;
                 prefix = "Error";
                 break;
             default:
