@@ -62,28 +62,13 @@ class Program
         addCommand.AddOption(readOption);
         readOption.SetDefaultValue(false);
 
-        addCommand.SetHandler(_bookwormService.AddBook, titleOption, categoryOption, readOption);
+        addCommand.SetHandler(Commands.OnHandleAddCommand, titleOption, categoryOption, readOption);
 
         var listCommand = new Command("list", "List all books")
         {
         };
         rootCmd.AddCommand(listCommand);
-        listCommand.SetHandler(() =>
-        {
-            var books = _bookwormService.ListBooks();
-            if (books.Any())
-            {
-                foreach (var book in books)
-                {
-                    var readStatus = book.Read ? "Read" : "Unread";
-                    Console.WriteLine($"Title: {book.Title}, Category: {book.Category}, Status: {readStatus}");
-                }
-            }
-            else
-            {
-                Helper.ShowMessage(MessageType.Info, ["No books found."]);
-            }
-        });
+        listCommand.SetHandler(Commands.OnHandleListCommand);
         var removeCommand = new Command("remove", "Remove a book")
         {
         };
@@ -93,7 +78,7 @@ class Program
             "The title of the book to remove"
         );
         removeCommand.AddOption(removeTitleOption);
-        removeCommand.SetHandler(_bookwormService.RemoveBook, removeTitleOption);
+        removeCommand.SetHandler(Commands.OnHandleRemoveCommand, removeTitleOption);
 
         var exportCommand = new Command("export", "Export books to a file")
         {
@@ -101,11 +86,13 @@ class Program
         rootCmd.AddCommand(exportCommand);
         var exportFileOption = new Option<string>(
             ["--file", "-f"],
-            "The file path to export the books to"
+            "The file path to export the books to json format (default is 'books.json')"
         )
         {
-            IsRequired = false
+            IsRequired = true,
         };
+        exportFileOption.LegalFileNamesOnly();
+        exportFileOption.SetDefaultValue("books.json");
         exportFileOption.AddValidator(result =>
         {
             var filePath = result.GetValueForOption(exportFileOption);
@@ -115,23 +102,27 @@ class Program
             }
             else if (!filePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             {
-                result.ErrorMessage = "File must have a .json extension.";
+                result.ErrorMessage = "File must have a json extension.";
             }
         });
         exportCommand.AddOption(exportFileOption);
-        exportCommand.SetHandler(async (filePath) =>
+        exportCommand.SetHandler(Commands.OnHandleExportCommand, exportFileOption);
+
+        var importCommand = new Command("import", "Import books from a file")
         {
-            try
-            {
-                await _bookwormService.ExportBooksAsync(filePath);
-                Helper.ShowMessage(MessageType.Info, ["Books exported successfully."]);
-            }
-            catch (Exception ex)
-            {
-                Helper.ShowMessage(MessageType.Error, [ex.Message]);
-            }
-        }, exportFileOption);
-        
+        };
+        rootCmd.AddCommand(importCommand);
+        var importFileOption = new Option<string>(
+            ["--file", "-f"],
+            "The file path to import books from json format"
+        )
+        {
+            IsRequired = true,
+        };
+        importFileOption.LegalFileNamesOnly();
+        importFileOption.SetDefaultValue("books.json");
+        importCommand.AddOption(importFileOption);
+        importCommand.SetHandler(Commands.OnHandleImportCommand, importFileOption);
 
         var parser = new CommandLineBuilder(rootCmd)
             .UseDefaults()
