@@ -32,11 +32,31 @@ public class BookwormService
 
     public IEnumerable<Book> ListBooks()
     {
-        throw new NotImplementedException();
+        if (_books.Count == 0)
+        {
+            return [];
+        }
+
+        return _books.OrderBy(b => b.Library).ThenBy(b => b.Shelf).ThenBy(b => b.Order);
+
     }
 
     public void RemoveBook(string title)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            Helper.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
+            return;
+        }
+
+        var bookToRemove = _books.FirstOrDefault(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+        if (bookToRemove == null)
+        {
+            Helper.ShowMessage(MessageType.Warning, ["No book found with the specified title."]);
+            return;
+        }
+
+        _books.Remove(bookToRemove);
+        Helper.ShowMessage(MessageType.Info, ["Book removed successfully."]);
     }
 }
