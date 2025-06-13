@@ -3,7 +3,6 @@ namespace bookworm;
 public class Book
 {
     public required string Title { get; set; }
-    public required uint Library { get; set; }
-    public required uint Shelf { get; set; }
-    public required uint Order { get; set; }
+    public required string Category { get; set; }
+    public required bool Read { get; set; }
 }

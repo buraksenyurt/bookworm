@@ -23,31 +23,25 @@ class Program
         );
         titleOption.IsRequired = true;
         addCommand.AddOption(titleOption);
-        var libraryOption = new Option<uint>(
-            ["--library", "-l"],
-            "The library ID where the book is located"
+        var categoryOption = new Option<string>(
+            ["--category", "-c"],
+            "The category of the book (optional)"
         )
         {
-            IsRequired = true
+            IsRequired = false
         };
-        addCommand.AddOption(libraryOption);
-        var shelfOption = new Option<uint>(
-            ["--shelf", "-s"],
-            "The shelf ID where the book is located"
+        addCommand.AddOption(categoryOption);
+        var readOption = new Option<bool>(
+            ["--read", "-r"],
+            "Indicates if the book has been read (default is false)"
         )
         {
-            IsRequired = true
+            IsRequired = false,
         };
-        addCommand.AddOption(shelfOption);
-        var orderOption = new Option<uint>(
-            ["--order", "-o"],
-            "The order ID of the book on the shelf"
-        )
-        {
-            IsRequired = true
-        };
-        addCommand.AddOption(orderOption);
-        addCommand.SetHandler(_bookwormService.AddBook, titleOption, libraryOption, shelfOption, orderOption);
+        addCommand.AddOption(readOption);
+        readOption.SetDefaultValue(false);
+
+        addCommand.SetHandler(_bookwormService.AddBook, titleOption, categoryOption, readOption);
 
         var listCommand = new Command("list", "List all books")
         {
@@ -60,7 +54,8 @@ class Program
             {
                 foreach (var book in books)
                 {
-                    Console.WriteLine($"Title: {book.Title}, Library: {book.Library}, Shelf: {book.Shelf}, Order: {book.Order}");
+                    var readStatus = book.Read ? "Read" : "Unread";
+                    Console.WriteLine($"Title: {book.Title}, Category: {book.Category}, Status: {readStatus}");
                 }
             }
             else

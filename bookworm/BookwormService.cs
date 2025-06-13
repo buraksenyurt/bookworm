@@ -4,7 +4,7 @@ public class BookwormService
 {
     private readonly List<Book> _books = [];
 
-    public void AddBook(string title, uint library, uint shelf, uint order)
+    public void AddBook(string title, string category, bool read)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -21,9 +21,8 @@ public class BookwormService
         var book = new Book
         {
             Title = title,
-            Library = library,
-            Shelf = shelf,
-            Order = order
+            Category = category ?? "Uncategorized",
+            Read = read
         };
 
         _books.Add(book);
@@ -37,8 +36,9 @@ public class BookwormService
             return [];
         }
 
-        return _books.OrderBy(b => b.Library).ThenBy(b => b.Shelf).ThenBy(b => b.Order);
-
+        return _books.OrderBy(b => b.Title)
+                     .ThenBy(b => b.Category)
+                     .ThenBy(b => b.Read);
     }
 
     public void RemoveBook(string title)
