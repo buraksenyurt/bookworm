@@ -1,0 +1,27 @@
+﻿@baseUrl = http://localhost:5112
+
+### Index
+GET {{baseUrl}}/
+
+### Add a new book
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "id": 0,
+  "title": "Dune",
+  "category": "Science",
+  "read": true
+}
+
+### List all books
+GET {{baseUrl}}/books
+
+### Get book by title
+GET {{baseUrl}}/books/Dune
+
+### Delete book by title
+DELETE {{baseUrl}}/books/Dune
+
+### Try to delete non-existent book
+DELETE {{baseUrl}}/books/UnknownBook
