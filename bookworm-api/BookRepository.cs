@@ -4,34 +4,33 @@ using Microsoft.Data.Sqlite;
 namespace bookworm_api;
 
 public class BookRepository(string connStr)
+    : IBookRepository
 {
     private readonly string _connStr = connStr;
 
-    public void Add(Book book)
+    public async Task AddAsync(Book book)
     {
         using var conn = new SqliteConnection(_connStr);
-        conn.Execute(@"INSERT INTO Books (Title, Category, Read, Created, Modified)
+        await conn.ExecuteAsync(@"INSERT INTO Books (Title, Category, Read, Created, Modified)
                     VALUES (@Title,@Category,@Read,@Created,@Modified)", book);
     }
-    public void Delete(int id)
+    public async Task DeleteAsync(int id)
     {
         using var conn = new SqliteConnection(_connStr);
-        conn.Execute("DELETE FROM Books Where Id = @id", new { id });
+        await conn.ExecuteAsync("DELETE FROM Books Where Id = @id", new { id });
     }
 
-    public Book? GetByTitle(string title)
+    public async Task<Book?> GetByTitleAsync(string title)
     {
         using var conn = new SqliteConnection(_connStr);
-        var row = conn.Query("SELECT Id, Title, Category, Read, Created, Modified FROM Books WHERE LOWER(Title) = LOWER(@title)", new { title });
+        var row = await conn.QueryAsync("SELECT Id, Title, Category, Read, Created, Modified FROM Books WHERE LOWER(Title) = LOWER(@title)", new { title });
         return row.Select(MapTo()).FirstOrDefault();
     }
 
-    public IEnumerable<Book> GetAll()
+    public async Task<IEnumerable<Book>> GetAllAsync()
     {
         using var conn = new SqliteConnection(_connStr);
-
-        var rows = conn.Query("SELECT Id, Title, Category, Read, Created, Modified FROM Books");
-
+        var rows = await conn.QueryAsync("SELECT Id, Title, Category, Read, Created, Modified FROM Books");
         return rows.Select(MapTo());
     }
 
