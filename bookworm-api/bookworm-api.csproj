@@ -7,4 +7,9 @@
     <RootNamespace>bookworm_api</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.6" />
+  </ItemGroup>
+
 </Project>
