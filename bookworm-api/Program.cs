@@ -18,7 +18,7 @@ app.MapPost("/books", (BookDto dto, BookRepository repository) =>
 
 app.MapGet("/books", (BookRepository repository) =>
 {
-    var books = repository.GetAll().Select(b => new BookDto(b.Id, b.Title, b.Category, b.Read));
+    var books = repository.GetAll().Select(b => new BookDto(b.Id, b.Title, b.Category, Convert.ToBoolean(b.Read)));
     return Results.Ok(books);
 });
 

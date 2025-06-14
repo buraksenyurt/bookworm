@@ -22,12 +22,28 @@ public class BookRepository(string connStr)
     public Book? GetByTitle(string title)
     {
         using var conn = new SqliteConnection(_connStr);
-        return conn.QueryFirstOrDefault<Book>("SELECT * FROM Books WHERE LOWER(Title) = LOWER(@title)", new { title });
+        var row = conn.Query("SELECT Id, Title, Category, Read, Created, Modified FROM Books WHERE LOWER(Title) = LOWER(@title)", new { title });
+        return row.Select(MapTo()).FirstOrDefault();
     }
 
     public IEnumerable<Book> GetAll()
     {
         using var conn = new SqliteConnection(_connStr);
-        return conn.Query<Book>("SELECT * FROM Books");
+
+        var rows = conn.Query("SELECT Id, Title, Category, Read, Created, Modified FROM Books");
+
+        return rows.Select(MapTo());
+    }
+
+    private static Func<dynamic, Book> MapTo()
+    {
+        return row => new Book(
+                    Id: (int)row.Id,
+                    Title: (string)row.Title,
+                    Category: (string)row.Category,
+                    Read: ((long)row.Read) == 1,
+                    Created: DateTime.Parse((string)row.Created),
+                    Modified: row.Modified is null ? null : DateTime.Parse((string)row.Modified)
+                );
     }
 }
