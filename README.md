@@ -1,6 +1,6 @@
 # bookworm
 
-Eğitimlerde kullanılmak üzere .Net platformunda yazılan bir CLI _(Command Line Interface)_ çalışması. Uygulama ile kategoriye göre kitapların bir listeye eklenmesi, listelenmesi, dosyaya çıkartılması veya dosyadan okunması gibi çeşitli fonksiyonellikler ele alınmaktadır.
+Eğitimlerde kullanılmak üzere .Net platformunda yazılan bir CLI _(Command Line Interface)_ çalışması. Uygulama ile kategoriye göre kitapların bir listeye eklenmesi, listelenmesi, dosyaya çıkartılması veya dosyadan okunması gibi çeşitli fonksiyonellikler ele alınmaktadır. Kitap bilgilerini saklamak içinse Sqlite tabanlı oldukça basit bir API hizmet söz konusudur. Terminal uygulaması bu hizmeti kullanır.
 
 ```bash
 # Belli bir kategoriye kitap eklemek
