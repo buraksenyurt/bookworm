@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using Serilog;
+using Spectre.Console;
 
 namespace bookworm;
 
@@ -19,6 +21,7 @@ public class Commands(BookwormService bookwormService)
             Helper.ShowMessage(MessageType.Error, ["Title cannot exceed 50 characters."]);
             return;
         }
+
         try
         {
 
@@ -67,7 +70,7 @@ public class Commands(BookwormService bookwormService)
         else
         {
             Log.Information("No books found.");
-            Helper.ShowMessage(MessageType.Info, ["No books found."]);
+            Helper.ShowMessage(MessageType.Warning, ["No books found."]);
         }
     }
 
@@ -98,6 +101,42 @@ public class Commands(BookwormService bookwormService)
         {
             Log.Error(ex, "Error importing books from {FilePath}.", filePath);
             Helper.ShowMessage(MessageType.Error, [ex.Message]);
+        }
+    }
+
+    public async Task OnHandleInteractiveMode(CancellationToken cancellationToken = default)
+    {
+        bool isRunning = true;
+
+        while (isRunning)
+        {
+            AnsiConsole.Write(new FigletText("Book Worms").Centered().Color(Color.Gold1));
+
+            var selectedMenu = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("[blue]Your choise?[/]")
+                .AddChoices([
+                    //"Add a new book",
+                    //"Remove book",
+                    "List",
+                    "Export",
+                    //"Import",
+                    "Exit"
+                ])
+            );
+
+            switch (selectedMenu)
+            {
+                case "List":
+                    await OnHandleListCommand(cancellationToken);
+                    break;
+                case "Export":
+                    await OnHandleExportCommand("books.json", cancellationToken);
+                    break;
+                case "Exit":
+                    isRunning = false;
+                    break;
+            }
         }
     }
 }

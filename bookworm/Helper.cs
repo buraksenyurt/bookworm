@@ -1,3 +1,5 @@
+using Spectre.Console;
+
 namespace bookworm;
 
 public static class Helper
@@ -8,32 +10,27 @@ public static class Helper
             return;
 
         string message = string.Join("\n", messages);
-        var originalColor = Console.ForegroundColor;
-
-        ConsoleColor newColor;
-        string prefix;
+        string color;
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
 
         switch (messageType)
         {
             case MessageType.Info:
-                newColor = ConsoleColor.Green;
-                prefix = "Info";
+                color = "bold green";
+                AnsiConsole.MarkupLine(Emoji.Known.BeatingHeart + " [bold green]Info[/] :beating_heart:");
                 break;
             case MessageType.Warning:
-                newColor = ConsoleColor.Yellow;
-                prefix = "Warning";
+                color = "bold yellow";
+                AnsiConsole.MarkupLine(Emoji.Known.Warning + " [bold yellow]Warnning[/] :warning:");
                 break;
             case MessageType.Error:
-                newColor = ConsoleColor.Red;
-                prefix = "Error";
+                color = "bold red";
+                AnsiConsole.MarkupLine(Emoji.Known.CrossMark + " [bold red]Error[/] :cross_mark:");
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null);
         }
-
-        Console.ForegroundColor = newColor;
-        Console.WriteLine($"{prefix}: {message}");
-        Console.ForegroundColor = originalColor;
+        AnsiConsole.MarkupLineInterpolated($"[{color}]{message}[/]");
     }
 }
 

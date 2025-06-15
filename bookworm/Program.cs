@@ -23,6 +23,19 @@ class Program
             Name = Constants.AppName,
         };
 
+        // Interactive mode Command
+        var uxCommand = new Command("interactive", "Manage book store interactively")
+        {
+        };
+        rootCmd.Add(uxCommand);
+        uxCommand.Handler = CommandHandler.Create<InvocationContext>(
+        async (ctx) =>
+        {
+            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            await commands.OnHandleInteractiveMode(ctx.GetCancellationToken());
+        });
+
+        // Add Command
         var addCommand = new Command("add", "Add a new book")
         {
         };
@@ -74,12 +87,11 @@ class Program
         addCommand.Handler = CommandHandler.Create<string, string, bool, InvocationContext>(
         async (title, category, read, ctx) =>
         {
-            Log.Information("Before context call");
             var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
-            Log.Information("After context call");
             await commands.OnHandleAddCommand(title, category, read, ctx.GetCancellationToken());
         });
 
+        // List Command
         var listCommand = new Command("list", "List all books")
         {
         };
@@ -91,6 +103,7 @@ class Program
             await commands.OnHandleListCommand(ctx.GetCancellationToken());
         });
 
+        // Remove Command
         var removeCommand = new Command("remove", "Remove a book")
         {
         };
@@ -107,6 +120,7 @@ class Program
             await commands.OnHandleRemoveCommand(title, ctx.GetCancellationToken());
         });
 
+        // Export Command
         var exportCommand = new Command("export", "Export books to a file")
         {
         };
@@ -140,7 +154,7 @@ class Program
             await commands.OnHandleExportCommand(file, ctx.GetCancellationToken());
         });
 
-
+        // Import Command
         var importCommand = new Command("import", "Import books from a file")
         {
         };
@@ -162,6 +176,7 @@ class Program
             await commands.OnHandleImportCommand(file, ctx.GetCancellationToken());
         });
 
+        // Builder
         var parser = new CommandLineBuilder(rootCmd)
             .UseHost(_ => Host.CreateDefaultBuilder(), host =>
             {
