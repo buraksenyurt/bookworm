@@ -1,20 +1,19 @@
 using System.Text.Json;
+using bookworm.Client;
 using Serilog;
 
 namespace bookworm;
 
-public class BookwormService
+public class BookwormService(IBookwormApiClient apiClient)
 {
-    private readonly List<Book> _books = [];
-
-    public void AddBook(string title, string category, bool read)
+    public async Task AddBookAsync(string title, string category, bool read, CancellationToken cancellationToken)
     {
-        if (_books.Any(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase)))
-        {
-            Log.Warning("A book with the title '{Title}' already exists.", title);
-            Helper.ShowMessage(MessageType.Warning, ["A book with this title already exists."]);
-            return;
-        }
+        // if (_books.Any(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase)))
+        // {
+        //     Log.Warning("A book with the title '{Title}' already exists.", title);
+        //     Helper.ShowMessage(MessageType.Warning, ["A book with this title already exists."]);
+        //     return;
+        // }
 
         var book = new Book
         {
@@ -23,39 +22,48 @@ public class BookwormService
             Read = read
         };
 
-        _books.Add(book);
+        await apiClient.AddAsync(book, cancellationToken);
     }
 
-    public IEnumerable<Book> GetAllBooks()
+    public async Task<IEnumerable<Book>> GetAllBooksAsync(CancellationToken cancellationToken)
     {
-        if (_books.Count == 0)
-        {
-            return [];
-        }
+        // if (_books.Count == 0)
+        // {
+        //     return [];
+        // }
 
-        return _books.OrderBy(b => b.Title)
-                     .ThenBy(b => b.Category)
-                     .ThenBy(b => b.Read);
+        // return _books.OrderBy(b => b.Title)
+        //              .ThenBy(b => b.Category)
+        //              .ThenBy(b => b.Read);
+        return await apiClient.GetAllAsync(cancellationToken);
     }
 
-    public void RemoveBook(string title)
+    public async Task RemoveBookAsync(string title, CancellationToken cancellationToken)
     {
-        var bookToRemove = _books.FirstOrDefault(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
-        if (bookToRemove == null)
-        {
-            Log.Warning("No book found with the title '{Title}'.", title);
-            Helper.ShowMessage(MessageType.Warning, ["No book found with the specified title."]);
-            return;
-        }
+        // var bookToRemove = _books.FirstOrDefault(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+        // if (bookToRemove == null)
+        // {
+        //     Log.Warning("No book found with the title '{Title}'.", title);
+        //     Helper.ShowMessage(MessageType.Warning, ["No book found with the specified title."]);
+        //     return;
+        // }
 
-        _books.Remove(bookToRemove);
-        Log.Information("Book '{Title}' removed successfully.", title);
+        // _books.Remove(bookToRemove);
+        // Log.Information("Book '{Title}' removed successfully.", title);
+        await apiClient.RemoveAsync(title, cancellationToken);
         Helper.ShowMessage(MessageType.Info, ["Book removed successfully."]);
     }
 
     public async Task ExportBooksAsync(string fileName, CancellationToken cancellationToken)
     {
-        var json = JsonSerializer.Serialize(_books);
+        var books = await apiClient.GetAllAsync(cancellationToken);
+        if (!books.Any())
+        {
+            Log.Information("There is no books in store for exporting");
+            Helper.ShowMessage(MessageType.Warning, ["There is no books in store for exporting"]);
+            return;
+        }
+        var json = JsonSerializer.Serialize(books);
         await File.WriteAllTextAsync(fileName, json, cancellationToken);
     }
 
@@ -73,7 +81,7 @@ public class BookwormService
 
         foreach (var book in importedBooks)
         {
-            AddBook(book.Title, book.Category, book.Read);
+            await AddBookAsync(book.Title, book.Category, book.Read, cancellationToken);
         }
     }
 }

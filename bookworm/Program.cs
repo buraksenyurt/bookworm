@@ -67,13 +67,16 @@ class Program
         addCommand.AddOption(readOption);
         readOption.SetDefaultValue(false);
 
-        addCommand.SetHandler(Commands.OnHandleAddCommand, titleOption, categoryOption, readOption);
+        addCommand.SetHandler(async (title, category, read) =>
+        {
+            await Commands.OnHandleAddCommand(title, category, read);
+        }, titleOption, categoryOption, readOption);
 
         var listCommand = new Command("list", "List all books")
         {
         };
         rootCmd.AddCommand(listCommand);
-        listCommand.SetHandler(Commands.OnHandleListCommand);
+        listCommand.SetHandler(async () => await Commands.OnHandleListCommand());
         var removeCommand = new Command("remove", "Remove a book")
         {
         };
@@ -83,7 +86,7 @@ class Program
             "The title of the book to remove"
         );
         removeCommand.AddOption(removeTitleOption);
-        removeCommand.SetHandler(Commands.OnHandleRemoveCommand, removeTitleOption);
+        removeCommand.SetHandler(async (title) => await Commands.OnHandleRemoveCommand(title), removeTitleOption);
 
         var exportCommand = new Command("export", "Export books to a file")
         {
@@ -111,7 +114,7 @@ class Program
             }
         });
         exportCommand.AddOption(exportFileOption);
-        exportCommand.SetHandler(async (token) => await Commands.OnHandleExportCommand(token), exportFileOption);
+        exportCommand.SetHandler(async (file) => await Commands.OnHandleExportCommand(file), exportFileOption);
 
         var importCommand = new Command("import", "Import books from a file")
         {
@@ -127,7 +130,7 @@ class Program
         importFileOption.LegalFileNamesOnly();
         importFileOption.SetDefaultValue("books.json");
         importCommand.AddOption(importFileOption);
-        importCommand.SetHandler(async (token) => await Commands.OnHandleImportCommand(token), importFileOption);
+        importCommand.SetHandler(async (file) => await Commands.OnHandleImportCommand(file), importFileOption);
 
         var parser = new CommandLineBuilder(rootCmd)
             .UseHost(_ => Host.CreateDefaultBuilder(), host =>

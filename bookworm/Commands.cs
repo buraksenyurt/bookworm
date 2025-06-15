@@ -1,11 +1,15 @@
+using bookworm.Client;
 using Serilog;
 
 namespace bookworm;
 
 public static class Commands
 {
-    private static readonly BookwormService _bookwormService = new();
-    public static void OnHandleAddCommand(string title, string category, bool read)
+    private static readonly BookwormService _bookwormService = new(new BookwormApiClient(new HttpClient
+    {
+        BaseAddress = new Uri("http://localhost:5112")
+    }));
+    public static async Task OnHandleAddCommand(string title, string category, bool read, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -21,12 +25,12 @@ public static class Commands
             return;
         }
 
-        _bookwormService.AddBook(title, category, read);
+        await _bookwormService.AddBookAsync(title, category, read, cancellationToken);
 
         Log.Information("Book '{Title}' added successfully.", title);
         Helper.ShowMessage(MessageType.Info, ["Book added successfully."]);
     }
-    public static void OnHandleRemoveCommand(string title)
+    public static async Task OnHandleRemoveCommand(string title, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -35,12 +39,12 @@ public static class Commands
             return;
         }
 
-        _bookwormService.RemoveBook(title);
+        await _bookwormService.RemoveBookAsync(title, cancellationToken);
     }
 
-    public static void OnHandleListCommand()
+    public static async Task OnHandleListCommand(CancellationToken cancellationToken = default)
     {
-        var books = _bookwormService.GetAllBooks();
+        var books = await _bookwormService.GetAllBooksAsync(cancellationToken);
         if (books.Any())
         {
             foreach (var book in books)
