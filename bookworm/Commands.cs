@@ -1,15 +1,10 @@
-using bookworm.Client;
 using Serilog;
 
 namespace bookworm;
 
-public static class Commands
+public class Commands(BookwormService bookwormService)
 {
-    private static readonly BookwormService _bookwormService = new(new BookwormApiClient(new HttpClient
-    {
-        BaseAddress = new Uri("http://localhost:5112")
-    }));
-    public static async Task OnHandleAddCommand(string title, string category, bool read, CancellationToken cancellationToken = default)
+    public async Task OnHandleAddCommand(string title, string category, bool read, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -25,12 +20,12 @@ public static class Commands
             return;
         }
 
-        await _bookwormService.AddBookAsync(title, category, read, cancellationToken);
+        await bookwormService.AddBookAsync(title, category, read, cancellationToken);
 
         Log.Information("Book '{Title}' added successfully.", title);
         Helper.ShowMessage(MessageType.Info, ["Book added successfully."]);
     }
-    public static async Task OnHandleRemoveCommand(string title, CancellationToken cancellationToken = default)
+    public async Task OnHandleRemoveCommand(string title, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -39,12 +34,12 @@ public static class Commands
             return;
         }
 
-        await _bookwormService.RemoveBookAsync(title, cancellationToken);
+        await bookwormService.RemoveBookAsync(title, cancellationToken);
     }
 
-    public static async Task OnHandleListCommand(CancellationToken cancellationToken = default)
+    public async Task OnHandleListCommand(CancellationToken cancellationToken = default)
     {
-        var books = await _bookwormService.GetAllBooksAsync(cancellationToken);
+        var books = await bookwormService.GetAllBooksAsync(cancellationToken);
         if (books.Any())
         {
             foreach (var book in books)
@@ -60,11 +55,11 @@ public static class Commands
         }
     }
 
-    public static async Task OnHandleExportCommand(string filePath, CancellationToken cancellationToken = default)
+    public async Task OnHandleExportCommand(string filePath, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _bookwormService.ExportBooksAsync(filePath, cancellationToken);
+            await bookwormService.ExportBooksAsync(filePath, cancellationToken);
             Log.Information("Books exported successfully to {FilePath}.", filePath);
             Helper.ShowMessage(MessageType.Info, ["Books exported successfully."]);
         }
@@ -75,11 +70,11 @@ public static class Commands
         }
     }
 
-    public static async Task OnHandleImportCommand(string filePath, CancellationToken cancellationToken = default)
+    public async Task OnHandleImportCommand(string filePath, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _bookwormService.ImportBooksAsync(filePath, cancellationToken);
+            await bookwormService.ImportBooksAsync(filePath, cancellationToken);
             Log.Information("Books imported successfully from {FilePath}.", filePath);
             Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
         }

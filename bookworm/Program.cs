@@ -1,7 +1,11 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
+using System.CommandLine.Invocation;
+using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
+using bookworm.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -67,16 +71,26 @@ class Program
         addCommand.AddOption(readOption);
         readOption.SetDefaultValue(false);
 
-        addCommand.SetHandler(async (title, category, read) =>
+        addCommand.Handler = CommandHandler.Create<string, string, bool, InvocationContext>(
+        async (title, category, read, ctx) =>
         {
-            await Commands.OnHandleAddCommand(title, category, read);
-        }, titleOption, categoryOption, readOption);
+            Log.Information("Before context call");
+            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            Log.Information("After context call");
+            await commands.OnHandleAddCommand(title, category, read, ctx.GetCancellationToken());
+        });
 
         var listCommand = new Command("list", "List all books")
         {
         };
         rootCmd.AddCommand(listCommand);
-        listCommand.SetHandler(async () => await Commands.OnHandleListCommand());
+        listCommand.Handler = CommandHandler.Create<InvocationContext>(
+        async ctx =>
+        {
+            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            await commands.OnHandleListCommand(ctx.GetCancellationToken());
+        });
+
         var removeCommand = new Command("remove", "Remove a book")
         {
         };
@@ -86,7 +100,12 @@ class Program
             "The title of the book to remove"
         );
         removeCommand.AddOption(removeTitleOption);
-        removeCommand.SetHandler(async (title) => await Commands.OnHandleRemoveCommand(title), removeTitleOption);
+        removeCommand.Handler = CommandHandler.Create<string, InvocationContext>(
+        async (title, ctx) =>
+        {
+            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            await commands.OnHandleRemoveCommand(title, ctx.GetCancellationToken());
+        });
 
         var exportCommand = new Command("export", "Export books to a file")
         {
@@ -114,7 +133,13 @@ class Program
             }
         });
         exportCommand.AddOption(exportFileOption);
-        exportCommand.SetHandler(async (file) => await Commands.OnHandleExportCommand(file), exportFileOption);
+        exportCommand.Handler = CommandHandler.Create<string, InvocationContext>(
+        async (file, ctx) =>
+        {
+            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            await commands.OnHandleExportCommand(file, ctx.GetCancellationToken());
+        });
+
 
         var importCommand = new Command("import", "Import books from a file")
         {
@@ -130,12 +155,17 @@ class Program
         importFileOption.LegalFileNamesOnly();
         importFileOption.SetDefaultValue("books.json");
         importCommand.AddOption(importFileOption);
-        importCommand.SetHandler(async (file) => await Commands.OnHandleImportCommand(file), importFileOption);
+        importCommand.Handler = CommandHandler.Create<string, InvocationContext>(
+        async (file, ctx) =>
+        {
+            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            await commands.OnHandleImportCommand(file, ctx.GetCancellationToken());
+        });
 
         var parser = new CommandLineBuilder(rootCmd)
             .UseHost(_ => Host.CreateDefaultBuilder(), host =>
             {
-                host.ConfigureServices(services =>
+                host.ConfigureServices((context, services) =>
                 {
                     services.AddSerilog(config =>
                     {
@@ -146,6 +176,14 @@ class Program
                             rollingInterval: RollingInterval.Day,
                             restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error);
                     });
+
+                    var apiBaseAddress = context.Configuration["Api:BaseUrl"] ?? "http://localhost:5112";
+                    services.AddHttpClient<IBookwormApiClient, BookwormApiClient>(client =>
+                    {
+                        client.BaseAddress = new Uri(apiBaseAddress);
+                    });
+                    services.AddSingleton<BookwormService>();
+                    services.AddSingleton<Commands>();
                 });
             })
             .UseDefaults()
