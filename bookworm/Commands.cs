@@ -19,8 +19,16 @@ public class Commands(BookwormService bookwormService)
             Helper.ShowMessage(MessageType.Error, ["Title cannot exceed 50 characters."]);
             return;
         }
+        try
+        {
 
-        await bookwormService.AddBookAsync(title, category, read, cancellationToken);
+            await bookwormService.AddBookAsync(title, category, read, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"{ex.Message}", ex);
+            return;
+        }
 
         Log.Information("Book '{Title}' added successfully.", title);
         Helper.ShowMessage(MessageType.Info, ["Book added successfully."]);
@@ -34,7 +42,15 @@ public class Commands(BookwormService bookwormService)
             return;
         }
 
-        await bookwormService.RemoveBookAsync(title, cancellationToken);
+        try
+        {
+            await bookwormService.RemoveBookAsync(title, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"{ex.Message}", ex);
+            return;
+        }
     }
 
     public async Task OnHandleListCommand(CancellationToken cancellationToken = default)
