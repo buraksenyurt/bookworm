@@ -36,35 +36,6 @@ class Program
             await commands.OnHandleInteractiveMode(ctx.GetCancellationToken());
         });
 
-        // List Command
-        var listCommand = new Command("list", "List all books")
-        {
-        };
-        rootCmd.AddCommand(listCommand);
-        listCommand.Handler = CommandHandler.Create<InvocationContext>(
-        async ctx =>
-        {
-            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
-            await commands.OnHandleListCommand(ctx.GetCancellationToken());
-        });
-
-        // Remove Command
-        var removeCommand = new Command("remove", "Remove a book")
-        {
-        };
-        rootCmd.AddCommand(removeCommand);
-        var removeTitleOption = new Option<string>(
-            ["--title", "-t"],
-            "The title of the book to remove"
-        );
-        removeCommand.AddOption(removeTitleOption);
-        removeCommand.Handler = CommandHandler.Create<string, InvocationContext>(
-        async (title, ctx) =>
-        {
-            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
-            await commands.OnHandleRemoveCommand(title, ctx.GetCancellationToken());
-        });
-
         // Export Command
         var exportCommand = new Command("export", "Export books to a file")
         {
@@ -136,7 +107,9 @@ class Program
 
         var bookwormService = host.Services.GetRequiredService<BookwormService>();
 
-        rootCmd.AddCommand(new AddCommand(bookwormService, "add", "Add a new book"));
+        rootCmd.AddCommand(new AddCommand(bookwormService, "add", "Add a new book to store"));
+        rootCmd.AddCommand(new ListCommand(bookwormService, "list", "List all books from store"));
+        rootCmd.AddCommand(new RemoveCommand(bookwormService, "remove", "Remove a book from store"));
 
         // Parser
         var parser = new CommandLineBuilder(rootCmd)

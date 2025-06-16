@@ -4,45 +4,7 @@ using Spectre.Console;
 namespace bookworm;
 
 public class CommandsOld(BookwormService bookwormService)
-{    
-    public async Task OnHandleRemoveCommand(string title, CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            Log.Error("Title cannot be null or empty.");
-            Helper.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
-            return;
-        }
-
-        try
-        {
-            await bookwormService.RemoveBookAsync(title, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            Log.Error($"{ex.Message}", ex);
-            return;
-        }
-    }
-
-    public async Task OnHandleListCommand(CancellationToken cancellationToken = default)
-    {
-        var books = await bookwormService.GetAllBooksAsync(cancellationToken);
-        if (books.Any())
-        {
-            foreach (var book in books)
-            {
-                var readStatus = book.Read ? "Read" : "Unread";
-                Console.WriteLine($"Title: {book.Title}, Category: {book.Category}, Status: {readStatus}");
-            }
-        }
-        else
-        {
-            Log.Information("No books found.");
-            Helper.ShowMessage(MessageType.Warning, ["No books found."]);
-        }
-    }
-
+{
     public async Task OnHandleExportCommand(string filePath, CancellationToken cancellationToken = default)
     {
         try
@@ -116,10 +78,10 @@ public class CommandsOld(BookwormService bookwormService)
                     var removeTitle = AnsiConsole.Prompt(
                         new TextPrompt<string>("Please provide the title of book")
                     );
-                    await OnHandleRemoveCommand(removeTitle, cancellationToken);
+                    // await OnHandleRemoveCommand(removeTitle, cancellationToken);
                     break;
                 case "List":
-                    await OnHandleListCommand(cancellationToken);
+                    // await OnHandleListCommand(cancellationToken);
                     break;
                 case "Export":
                     var outputFile = AnsiConsole.Prompt(
