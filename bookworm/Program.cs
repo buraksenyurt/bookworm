@@ -5,6 +5,7 @@ using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using bookworm.Client;
+using bookworm.Commands.Book;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -31,64 +32,8 @@ class Program
         uxCommand.Handler = CommandHandler.Create<InvocationContext>(
         async (ctx) =>
         {
-            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
             await commands.OnHandleInteractiveMode(ctx.GetCancellationToken());
-        });
-
-        // Add Command
-        var addCommand = new Command("add", "Add a new book")
-        {
-        };
-        rootCmd.AddCommand(addCommand);
-        var titleOption = new Option<string>(
-            ["--title", "-t"],
-            "The title of the book to add"
-        )
-        {
-            IsRequired = true
-        };
-        titleOption.AddValidator(result =>
-        {
-            var title = result.GetValueForOption(titleOption);
-            if (string.IsNullOrWhiteSpace(title))
-            {
-                result.ErrorMessage = "Title cannot be null or empty.";
-            }
-            else if (title.Length > 50)
-            {
-                result.ErrorMessage = "Title cannot exceed 50 characters.";
-            }
-        });
-        addCommand.AddOption(titleOption);
-        var categoryOption = new Option<string>(
-            ["--category", "-c"],
-            "The category of the book (optional)"
-        )
-        {
-            IsRequired = false,
-        };
-
-        categoryOption.SetDefaultValue("Uncategorized");
-        categoryOption.FromAmong(Constants.Categories);
-        categoryOption.AllowMultipleArgumentsPerToken = true;
-        categoryOption.AddCompletions(Constants.Categories);
-
-        addCommand.AddOption(categoryOption);
-        var readOption = new Option<bool>(
-            ["--read", "-r"],
-            "Indicates if the book has been read (default is false)"
-        )
-        {
-            IsRequired = false,
-        };
-        addCommand.AddOption(readOption);
-        readOption.SetDefaultValue(false);
-
-        addCommand.Handler = CommandHandler.Create<string, string, bool, InvocationContext>(
-        async (title, category, read, ctx) =>
-        {
-            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
-            await commands.OnHandleAddCommand(title, category, read, ctx.GetCancellationToken());
         });
 
         // List Command
@@ -99,7 +44,7 @@ class Program
         listCommand.Handler = CommandHandler.Create<InvocationContext>(
         async ctx =>
         {
-            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
             await commands.OnHandleListCommand(ctx.GetCancellationToken());
         });
 
@@ -116,7 +61,7 @@ class Program
         removeCommand.Handler = CommandHandler.Create<string, InvocationContext>(
         async (title, ctx) =>
         {
-            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
             await commands.OnHandleRemoveCommand(title, ctx.GetCancellationToken());
         });
 
@@ -150,7 +95,7 @@ class Program
         exportCommand.Handler = CommandHandler.Create<string, InvocationContext>(
         async (file, ctx) =>
         {
-            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
             await commands.OnHandleExportCommand(file, ctx.GetCancellationToken());
         });
 
@@ -172,33 +117,42 @@ class Program
         importCommand.Handler = CommandHandler.Create<string, InvocationContext>(
         async (file, ctx) =>
         {
-            var commands = ctx.GetHost().Services.GetRequiredService<Commands>();
+            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
             await commands.OnHandleImportCommand(file, ctx.GetCancellationToken());
         });
 
-        // Builder
+        var host = Host.CreateDefaultBuilder(args)
+            .ConfigureServices((context, services) =>
+            {
+                var apiBaseAddress = context.Configuration["Api:BaseUrl"] ?? "http://localhost:5112";
+                services.AddHttpClient<IBookwormApiClient, BookwormApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri(apiBaseAddress);
+                });
+                services.AddSingleton<BookwormService>();
+                services.AddSingleton<CommandsOld>();
+            })
+            .Build();
+
+        var bookwormService = host.Services.GetRequiredService<BookwormService>();
+
+        rootCmd.AddCommand(new AddCommand(bookwormService, "add", "Add a new book"));
+
+        // Parser
         var parser = new CommandLineBuilder(rootCmd)
             .UseHost(_ => Host.CreateDefaultBuilder(), host =>
             {
-                host.ConfigureServices((context, services) =>
+                host.ConfigureServices(services =>
                 {
                     services.AddSerilog(config =>
-                    {
-                        config.MinimumLevel.Information();
-                        config.WriteTo.Console();
-                        config.WriteTo.File(
-                            "logs/bookworm.log",
-                            rollingInterval: RollingInterval.Day,
-                            restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error);
-                    });
-
-                    var apiBaseAddress = context.Configuration["Api:BaseUrl"] ?? "http://localhost:5112";
-                    services.AddHttpClient<IBookwormApiClient, BookwormApiClient>(client =>
-                    {
-                        client.BaseAddress = new Uri(apiBaseAddress);
-                    });
-                    services.AddSingleton<BookwormService>();
-                    services.AddSingleton<Commands>();
+                        {
+                            config.MinimumLevel.Information();
+                            config.WriteTo.Console();
+                            config.WriteTo.File(
+                                "logs/bookworm.log",
+                                rollingInterval: RollingInterval.Day,
+                                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error);
+                        });
                 });
             })
             .UseDefaults()

@@ -1,42 +1,10 @@
-using System.Formats.Asn1;
-using System.Threading.Tasks;
 using Serilog;
 using Spectre.Console;
 
 namespace bookworm;
 
-public class Commands(BookwormService bookwormService)
-{
-    public async Task OnHandleAddCommand(string title, string category, bool read, CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            Log.Error("Title cannot be null or empty.");
-            Helper.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
-            return;
-        }
-
-        if (title.Length > 50)
-        {
-            Log.Error("Title cannot exceed 50 characters.");
-            Helper.ShowMessage(MessageType.Error, ["Title cannot exceed 50 characters."]);
-            return;
-        }
-
-        try
-        {
-
-            await bookwormService.AddBookAsync(title, category, read, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            Log.Error($"{ex.Message}", ex);
-            return;
-        }
-
-        Log.Information("Book '{Title}' added successfully.", title);
-        Helper.ShowMessage(MessageType.Info, ["Book added successfully."]);
-    }
+public class CommandsOld(BookwormService bookwormService)
+{    
     public async Task OnHandleRemoveCommand(string title, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(title))
@@ -142,7 +110,7 @@ public class Commands(BookwormService bookwormService)
                         .AddChoices("Yes", "No")
                     );
                     bool read = asnwer == "Yes";
-                    await OnHandleAddCommand(title, category, read, cancellationToken);
+                    // await OnHandleAddCommand(title, category, read, cancellationToken);
                     break;
                 case "Remove book":
                     var removeTitle = AnsiConsole.Prompt(
