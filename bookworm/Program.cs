@@ -6,6 +6,8 @@ using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using bookworm.Client;
 using bookworm.Commands.Book;
+using bookworm.Commands.Export;
+using bookworm.Commands.Import;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -36,62 +38,6 @@ class Program
             await commands.OnHandleInteractiveMode(ctx.GetCancellationToken());
         });
 
-        // Export Command
-        var exportCommand = new Command("export", "Export books to a file")
-        {
-        };
-        rootCmd.AddCommand(exportCommand);
-        var exportFileOption = new Option<string>(
-            ["--file", "-f"],
-            "The file path to export the books to json format (default is 'books.json')"
-        )
-        {
-            IsRequired = true,
-        };
-        exportFileOption.LegalFileNamesOnly();
-        exportFileOption.SetDefaultValue("books.json");
-        exportFileOption.AddValidator(result =>
-        {
-            var filePath = result.GetValueForOption(exportFileOption);
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                result.ErrorMessage = "File path cannot be null or empty.";
-            }
-            else if (!filePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-            {
-                result.ErrorMessage = "File must have a json extension.";
-            }
-        });
-        exportCommand.AddOption(exportFileOption);
-        exportCommand.Handler = CommandHandler.Create<string, InvocationContext>(
-        async (file, ctx) =>
-        {
-            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
-            await commands.OnHandleExportCommand(file, ctx.GetCancellationToken());
-        });
-
-        // Import Command
-        var importCommand = new Command("import", "Import books from a file")
-        {
-        };
-        rootCmd.AddCommand(importCommand);
-        var importFileOption = new Option<string>(
-            ["--file", "-f"],
-            "The file path to import books from json format"
-        )
-        {
-            IsRequired = true,
-        };
-        importFileOption.LegalFileNamesOnly();
-        importFileOption.SetDefaultValue("books.json");
-        importCommand.AddOption(importFileOption);
-        importCommand.Handler = CommandHandler.Create<string, InvocationContext>(
-        async (file, ctx) =>
-        {
-            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
-            await commands.OnHandleImportCommand(file, ctx.GetCancellationToken());
-        });
-
         var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices((context, services) =>
             {
@@ -110,6 +56,8 @@ class Program
         rootCmd.AddCommand(new AddCommand(bookwormService, "add", "Add a new book to store"));
         rootCmd.AddCommand(new ListCommand(bookwormService, "list", "List all books from store"));
         rootCmd.AddCommand(new RemoveCommand(bookwormService, "remove", "Remove a book from store"));
+        rootCmd.AddCommand(new ExportCommand(bookwormService, "export", "Export books to a file (default:books.json)"));
+        rootCmd.AddCommand(new ImportCommand(bookwormService, "import", "Import books from file (default:books.json)"));
 
         // Parser
         var parser = new CommandLineBuilder(rootCmd)
