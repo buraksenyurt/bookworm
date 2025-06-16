@@ -1,13 +1,12 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
-using System.CommandLine.Invocation;
-using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using bookworm.Client;
 using bookworm.Commands.Book;
 using bookworm.Commands.Export;
 using bookworm.Commands.Import;
+using bookworm.Commands.Interactive;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -26,18 +25,6 @@ class Program
             Name = Constants.AppName,
         };
 
-        // Interactive mode Command
-        var uxCommand = new Command("interactive", "Manage book store interactively")
-        {
-        };
-        rootCmd.Add(uxCommand);
-        uxCommand.Handler = CommandHandler.Create<InvocationContext>(
-        async (ctx) =>
-        {
-            var commands = ctx.GetHost().Services.GetRequiredService<CommandsOld>();
-            await commands.OnHandleInteractiveMode(ctx.GetCancellationToken());
-        });
-
         var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices((context, services) =>
             {
@@ -47,7 +34,6 @@ class Program
                     client.BaseAddress = new Uri(apiBaseAddress);
                 });
                 services.AddSingleton<BookwormService>();
-                services.AddSingleton<CommandsOld>();
             })
             .Build();
 
@@ -58,6 +44,7 @@ class Program
         rootCmd.AddCommand(new RemoveCommand(bookwormService, "remove", "Remove a book from store"));
         rootCmd.AddCommand(new ExportCommand(bookwormService, "export", "Export books to a file (default:books.json)"));
         rootCmd.AddCommand(new ImportCommand(bookwormService, "import", "Import books from file (default:books.json)"));
+        rootCmd.AddCommand(new InteractiveCommand(bookwormService, "interactive", "Manage book store interactively"));
 
         // Parser
         var parser = new CommandLineBuilder(rootCmd)
