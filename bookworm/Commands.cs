@@ -116,22 +116,50 @@ public class Commands(BookwormService bookwormService)
                 new SelectionPrompt<string>()
                 .Title("[blue]Your choise?[/]")
                 .AddChoices([
-                    //"Add a new book",
-                    //"Remove book",
+                    "Add a new book",
+                    "Remove book",
                     "List",
                     "Export",
-                    //"Import",
+                    "Import",
                     "Exit"
                 ])
             );
 
             switch (selectedMenu)
             {
+                case "Add a new book":
+                    var title = AnsiConsole.Prompt(
+                        new TextPrompt<string>("Please provide the title of book")
+                    );
+                    var category = AnsiConsole.Prompt(
+                        new TextPrompt<string>("Please provide the category of book")
+                        .AddChoices(Constants.Categories)
+                    );
+                    var read = AnsiConsole.Prompt(new TextPrompt<bool>("did you read?"));
+                    await OnHandleAddCommand(title, category, read, cancellationToken);
+                    break;
+                case "Remove book":
+                    var removeTitle = AnsiConsole.Prompt(
+                        new TextPrompt<string>("Please provide the title of book")
+                    );
+                    await OnHandleRemoveCommand(removeTitle, cancellationToken);
+                    break;
                 case "List":
                     await OnHandleListCommand(cancellationToken);
                     break;
                 case "Export":
-                    await OnHandleExportCommand("books.json", cancellationToken);
+                    var outputFile = AnsiConsole.Prompt(
+                        new TextPrompt<string>("Please provide the output file name (default:'books.json')")
+                        .DefaultValue("books.json")
+                    );
+                    await OnHandleExportCommand(outputFile, cancellationToken);
+                    break;
+                case "Import":
+                    var inputFile = AnsiConsole.Prompt(
+                           new TextPrompt<string>("Please provide the input file name (default:'books.json')")
+                           .DefaultValue("books.json")
+                       );
+                    await OnHandleImportCommand(inputFile, cancellationToken);
                     break;
                 case "Exit":
                     isRunning = false;
