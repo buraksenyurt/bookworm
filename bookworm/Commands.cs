@@ -1,3 +1,4 @@
+using System.Formats.Asn1;
 using System.Threading.Tasks;
 using Serilog;
 using Spectre.Console;
@@ -132,10 +133,15 @@ public class Commands(BookwormService bookwormService)
                         new TextPrompt<string>("Please provide the title of book")
                     );
                     var category = AnsiConsole.Prompt(
-                        new TextPrompt<string>("Please provide the category of book")
+                        new SelectionPrompt<string>()
+                        .Title("Please provide the category of book")
                         .AddChoices(Constants.Categories)
                     );
-                    var read = AnsiConsole.Prompt(new TextPrompt<bool>("did you read?"));
+                    var asnwer = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>().Title("Did you read this book?")
+                        .AddChoices("Yes", "No")
+                    );
+                    bool read = asnwer == "Yes";
                     await OnHandleAddCommand(title, category, read, cancellationToken);
                     break;
                 case "Remove book":
