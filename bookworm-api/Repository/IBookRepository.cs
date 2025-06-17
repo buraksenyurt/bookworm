@@ -1,4 +1,4 @@
-namespace bookworm_api;
+namespace bookworm_api.Repository;
 
 public interface IBookRepository
 {

@@ -11,7 +11,7 @@ public class RemoveCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private Option<string> titleOption = new(
+    private readonly Option<string> titleOption = new(
             ["--title", "-t"],
             "The title of the book to remove"
         );

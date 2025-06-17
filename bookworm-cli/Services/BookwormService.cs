@@ -1,6 +1,6 @@
 using System.Text.Json;
 using bookworm_cli;
-using bookworm_cli.Client;
+using Client;
 using Serilog;
 
 namespace Services;

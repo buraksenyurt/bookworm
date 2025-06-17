@@ -1,4 +1,5 @@
 using bookworm_api;
+using bookworm_api.Repository;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 using Serilog.Events;
@@ -51,6 +52,7 @@ app.MapGet("/books", async (IBookRepository repository) =>
 {
     var books = await repository.GetAllAsync();
     var dtos = books.Select(b => new BookDto(b.Id, b.Title, b.Category, Convert.ToBoolean(b.Read)));
+    Log.Information($"Fetching '{dtos.Count()}' books");
     return Results.Ok(books);
 });
 
@@ -62,6 +64,7 @@ app.MapGet("/books/{title}", async (string title, IBookRepository repository) =>
         Log.Warning($"Book with title '{title}' not found");
         return Results.NotFound(new { message = $"Book with title '{title}' not found :/" });
     }
+    Log.Information($"Returning '{book.Title}'");
     return Results.Ok(new BookDto(book.Id, book.Title, book.Category, book.Read));
 });
 
@@ -74,6 +77,7 @@ app.MapDelete("/books/{title}", async (string title, IBookRepository repository)
         return Results.NotFound(new { message = $"Book with title '{title}' not found :/" });
     }
     await repository.DeleteAsync(book.Id);
+    Log.Information($"Book Id {book.Id},'{book.Title}' has been deleted");
     return Results.Ok(new { message = $"Book '{title}' removed from deppo successfully." });
 });
 

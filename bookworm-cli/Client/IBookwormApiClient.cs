@@ -1,4 +1,6 @@
-namespace bookworm_cli.Client;
+using bookworm_cli;
+
+namespace Client;
 
 public interface IBookwormApiClient
 {

@@ -11,7 +11,7 @@ public class ImportCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private Option<string> importFileOption = new(
+    private readonly Option<string> importFileOption = new(
             ["--file", "-f"],
             "The file path to import books from json format"
         )

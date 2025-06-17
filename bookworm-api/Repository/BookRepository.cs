@@ -2,7 +2,7 @@ using Dapper;
 using Microsoft.Data.Sqlite;
 using Serilog;
 
-namespace bookworm_api;
+namespace bookworm_api.Repository;
 
 public class BookRepository(string connStr)
     : IBookRepository
@@ -73,7 +73,7 @@ public class BookRepository(string connStr)
                     Id: (int)row.Id,
                     Title: (string)row.Title,
                     Category: (string)row.Category,
-                    Read: ((long)row.Read) == 1,
+                    Read: (long)row.Read == 1,
                     Created: DateTime.Parse((string)row.Created),
                     Modified: row.Modified is null ? null : DateTime.Parse((string)row.Modified)
                 );

@@ -2,7 +2,7 @@
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
 using System.CommandLine.Parsing;
-using bookworm_cli.Client;
+using Client;
 using Commands.Book;
 using Commands.Export;
 using Commands.Import;
@@ -51,9 +51,9 @@ class Program
         var parser = new CommandLineBuilder(rootCmd)
             .UseHost(_ => Host.CreateDefaultBuilder(), host =>
             {
-                host.ConfigureServices(services =>
+                _ = host.ConfigureServices(services =>
                 {
-                    services.AddSerilog(config =>
+                    _ = services.AddSerilog(config =>
                         {
                             config.MinimumLevel.Information();
                             config.WriteTo.Console();

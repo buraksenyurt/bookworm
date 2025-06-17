@@ -11,7 +11,7 @@ public class ExportCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private Option<string> exportFileOption = new(
+    private readonly Option<string> exportFileOption = new(
             ["--file", "-f"],
             "The file path to export the books to json format (default is 'books.json')"
         )

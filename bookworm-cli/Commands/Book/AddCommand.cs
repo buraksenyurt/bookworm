@@ -11,7 +11,7 @@ public class AddCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private Option<string> titleOption = new(
+    private readonly Option<string> titleOption = new(
             ["--title", "-t"],
             "The title of the book to add"
         )
@@ -19,7 +19,7 @@ public class AddCommand
         IsRequired = true,
     };
 
-    private Option<string> categoryOption = new(
+    private readonly Option<string> categoryOption = new(
             ["--category", "-c"],
             "The category of the book (optional)"
         )
@@ -27,7 +27,7 @@ public class AddCommand
         IsRequired = false,
     };
 
-    private Option<bool> readOption = new(
+    private readonly Option<bool> readOption = new(
             ["--read", "-r"],
             "Indicates if the book has been read (default is false)"
         )
