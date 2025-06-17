@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bookworm-api", "bookworm-ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bookworm-cli", "bookworm-cli\bookworm-cli.csproj", "{FED87934-EC89-77DD-3629-94BA82A9F562}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bookworm-cli.UnitTests", "bookworm-cli.UnitTests\bookworm-cli.UnitTests.csproj", "{8355A3FA-BD6A-418F-9C6B-4F398C1425B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{FED87934-EC89-77DD-3629-94BA82A9F562}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FED87934-EC89-77DD-3629-94BA82A9F562}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FED87934-EC89-77DD-3629-94BA82A9F562}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8355A3FA-BD6A-418F-9C6B-4F398C1425B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8355A3FA-BD6A-418F-9C6B-4F398C1425B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8355A3FA-BD6A-418F-9C6B-4F398C1425B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8355A3FA-BD6A-418F-9C6B-4F398C1425B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
