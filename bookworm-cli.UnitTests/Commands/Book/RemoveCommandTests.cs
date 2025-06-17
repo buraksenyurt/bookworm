@@ -47,4 +47,21 @@ public class RemoveCommandTests
                 It.IsAny<CancellationToken>())
             , Times.Once);
     }
+
+    [Fact]
+    public async Task ShouldCallService_WhenInputIsValid()
+    {
+        var title = "System Programming with Rust";
+
+        _bookwormServiceMock.Setup(
+            s => s.RemoveBookAsync(
+                title,
+                It.IsAny<CancellationToken>()
+        )).ReturnsAsync(true);
+
+        var result = await _command.InvokeAsync($"--title \"{title}\"");
+
+        _bookwormServiceMock.Verify(
+            s => s.RemoveBookAsync(title, It.IsAny<CancellationToken>()), Times.Once);
+    }
 }

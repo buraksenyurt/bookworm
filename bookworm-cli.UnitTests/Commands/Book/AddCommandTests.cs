@@ -51,16 +51,18 @@ public class AddCommandTests
         var category = "Technical-Books";
         var read = true;
 
-        var result = await _command.InvokeAsync($"--title \"{title}\" --category \"{category}\" --read {read}");
-
-        _bookwormServiceMock.Verify(
+        _bookwormServiceMock.Setup(
             s => s.AddBookAsync(
                 title,
                 category,
                 read,
                 It.IsAny<CancellationToken>()
-                ),
-            Times.Once);
+        )).ReturnsAsync(true);
+
+        var result = await _command.InvokeAsync($"--title \"{title}\" --category \"{category}\" --read {read}");
+
+        _bookwormServiceMock.Verify(
+            s => s.AddBookAsync(title, category, read, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
