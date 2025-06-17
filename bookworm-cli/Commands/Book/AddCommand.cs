@@ -95,15 +95,22 @@ public class AddCommand
         try
         {
 
-            await _bookwormService.AddBookAsync(title, category, read, cancellationToken);
+            var result = await _bookwormService.AddBookAsync(title, category, read, cancellationToken);
+            if (result)
+            {
+                Log.Information("Book '{Title}' added successfully.", title);
+                Helper.ShowMessage(MessageType.Info, ["Book added successfully."]);
+            }
+            else
+            {
+                Log.Warning("Book '{Title}' could not be added.", title);
+                Helper.ShowMessage(MessageType.Warning, ["Book could not be added."]);
+            }
         }
         catch (Exception ex)
         {
             Log.Error($"{ex.Message}", ex);
             return;
         }
-
-        Log.Information("Book '{Title}' added successfully.", title);
-        Helper.ShowMessage(MessageType.Info, ["Book added successfully."]);
     }
 }

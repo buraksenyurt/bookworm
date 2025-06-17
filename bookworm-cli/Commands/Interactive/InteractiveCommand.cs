@@ -78,16 +78,23 @@ public class InteractiveCommand
                     try
                     {
 
-                        await _bookwormService.AddBookAsync(title, category, read, cancellationToken);
+                        var result = await _bookwormService.AddBookAsync(title, category, read, cancellationToken);
+                        if (result)
+                        {
+                            Log.Information("Book '{Title}' added successfully.", title);
+                            Helper.ShowMessage(MessageType.Info, ["Book added successfully."]);
+                        }
+                        else
+                        {
+                            Log.Warning("Book '{Title}' could not be added.", title);
+                            Helper.ShowMessage(MessageType.Warning, ["Book could not be added."]);
+                        }
                     }
                     catch (Exception ex)
                     {
                         Log.Error($"{ex.Message}", ex);
                         return;
                     }
-
-                    Log.Information("Book '{Title}' added successfully.", title);
-                    Helper.ShowMessage(MessageType.Info, ["Book added successfully."]);
                     break;
                 case "Remove book":
                     var removeTitle = AnsiConsole.Prompt(
@@ -102,7 +109,17 @@ public class InteractiveCommand
 
                     try
                     {
-                        await _bookwormService.RemoveBookAsync(removeTitle, cancellationToken);
+                        var result = await _bookwormService.RemoveBookAsync(removeTitle, cancellationToken);
+                        if (result)
+                        {
+                            Log.Information("Book '{Title}' removed successfully.", removeTitle);
+                            Helper.ShowMessage(MessageType.Info, ["Book removed successfully."]);
+                        }
+                        else
+                        {
+                            Log.Warning("Book '{Title}' could not be removed.", removeTitle);
+                            Helper.ShowMessage(MessageType.Warning, ["Book could not be removed."]);
+                        }
                     }
                     catch (Exception ex)
                     {

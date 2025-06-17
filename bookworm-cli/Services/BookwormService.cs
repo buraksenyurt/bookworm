@@ -8,7 +8,7 @@ namespace Services;
 public class BookwormService(IBookwormApiClient apiClient) 
     : IBookwormService
 {
-    public async Task AddBookAsync(string title, string category, bool read, CancellationToken cancellationToken)
+    public async Task<bool> AddBookAsync(string title, string category, bool read, CancellationToken cancellationToken)
     {
         var book = new Book
         {
@@ -17,7 +17,7 @@ public class BookwormService(IBookwormApiClient apiClient)
             Read = read
         };
 
-        await apiClient.AddAsync(book, cancellationToken);
+        return await apiClient.AddAsync(book, cancellationToken);
     }
 
     public async Task<IEnumerable<Book>> GetAllBooksAsync(CancellationToken cancellationToken)
@@ -25,10 +25,9 @@ public class BookwormService(IBookwormApiClient apiClient)
         return await apiClient.GetAllAsync(cancellationToken);
     }
 
-    public async Task RemoveBookAsync(string title, CancellationToken cancellationToken)
+    public async Task<bool> RemoveBookAsync(string title, CancellationToken cancellationToken)
     {
-        await apiClient.RemoveAsync(title, cancellationToken);
-        Helper.ShowMessage(MessageType.Info, ["Book removed successfully."]);
+        return await apiClient.RemoveAsync(title, cancellationToken);        
     }
 
     public async Task ExportBooksAsync(string fileName, CancellationToken cancellationToken)

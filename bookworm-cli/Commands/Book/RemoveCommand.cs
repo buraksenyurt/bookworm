@@ -40,7 +40,18 @@ public class RemoveCommand
 
         try
         {
-            await _bookwormService.RemoveBookAsync(title, cancellationToken);
+            var result = await _bookwormService.RemoveBookAsync(title, cancellationToken);
+
+            if (result)
+            {
+                Log.Information("Book '{Title}' removed successfully.", title);
+                Helper.ShowMessage(MessageType.Info, ["Book removed successfully."]);
+            }
+            else
+            {
+                Log.Warning("Book '{Title}' could not be removed.", title);
+                Helper.ShowMessage(MessageType.Warning, ["Book could not be removed."]);
+            }
         }
         catch (Exception ex)
         {
