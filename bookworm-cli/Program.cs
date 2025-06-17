@@ -2,16 +2,16 @@
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
 using System.CommandLine.Parsing;
-using bookworm.Client;
-using bookworm.Commands.Book;
-using bookworm.Commands.Export;
-using bookworm.Commands.Import;
-using bookworm.Commands.Interactive;
+using bookworm_cli.Client;
+using Commands.Book;
+using Commands.Export;
+using Commands.Import;
+using Commands.Interactive;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace bookworm;
+namespace bookworm_cli;
 
 class Program
 {

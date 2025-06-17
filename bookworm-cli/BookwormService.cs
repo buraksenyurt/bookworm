@@ -1,8 +1,8 @@
 using System.Text.Json;
-using bookworm.Client;
+using bookworm_cli.Client;
 using Serilog;
 
-namespace bookworm;
+namespace bookworm_cli;
 
 public class BookwormService(IBookwormApiClient apiClient)
 {

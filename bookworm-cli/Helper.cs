@@ -1,6 +1,6 @@
 using Spectre.Console;
 
-namespace bookworm;
+namespace bookworm_cli;
 
 public static class Helper
 {

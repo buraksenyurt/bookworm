@@ -1,9 +1,10 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
+using bookworm_cli;
 using Serilog;
 
-namespace bookworm.Commands.Import;
+namespace Commands.Import;
 
 public class ImportCommand
     : Command

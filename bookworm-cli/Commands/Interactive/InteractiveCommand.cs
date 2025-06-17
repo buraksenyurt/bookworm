@@ -1,10 +1,11 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
+using bookworm_cli;
 using Serilog;
 using Spectre.Console;
 
-namespace bookworm.Commands.Interactive;
+namespace Commands.Interactive;
 
 public class InteractiveCommand
     : Command

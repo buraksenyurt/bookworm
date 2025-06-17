@@ -1,4 +1,4 @@
-namespace bookworm;
+namespace bookworm_cli;
 
 public class Constants
 {

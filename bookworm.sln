@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bookworm-api", "bookworm-api\bookworm-api.csproj", "{DF67B7A8-62AD-8B6A-6271-3287E14B20EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bookworm-cli", "bookworm-cli\bookworm-cli.csproj", "{FED87934-EC89-77DD-3629-94BA82A9F562}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF67B7A8-62AD-8B6A-6271-3287E14B20EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF67B7A8-62AD-8B6A-6271-3287E14B20EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF67B7A8-62AD-8B6A-6271-3287E14B20EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF67B7A8-62AD-8B6A-6271-3287E14B20EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FED87934-EC89-77DD-3629-94BA82A9F562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED87934-EC89-77DD-3629-94BA82A9F562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FED87934-EC89-77DD-3629-94BA82A9F562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FED87934-EC89-77DD-3629-94BA82A9F562}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0EAFAC25-B4E8-42F7-B67B-5A03CC3AEFE4}
+	EndGlobalSection
+EndGlobal

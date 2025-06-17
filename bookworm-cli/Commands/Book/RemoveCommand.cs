@@ -1,9 +1,10 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
+using bookworm_cli;
 using Serilog;
 
-namespace bookworm.Commands.Book;
+namespace Commands.Book;
 
 public class RemoveCommand
     : Command
