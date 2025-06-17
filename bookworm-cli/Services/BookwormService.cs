@@ -1,10 +1,12 @@
 using System.Text.Json;
+using bookworm_cli;
 using bookworm_cli.Client;
 using Serilog;
 
-namespace bookworm_cli;
+namespace Services;
 
-public class BookwormService(IBookwormApiClient apiClient)
+public class BookwormService(IBookwormApiClient apiClient) 
+    : IBookwormService
 {
     public async Task AddBookAsync(string title, string category, bool read, CancellationToken cancellationToken)
     {

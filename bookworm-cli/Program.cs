@@ -10,6 +10,7 @@ using Commands.Interactive;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Services;
 
 namespace bookworm_cli;
 
@@ -33,11 +34,11 @@ class Program
                 {
                     client.BaseAddress = new Uri(apiBaseAddress);
                 });
-                services.AddSingleton<BookwormService>();
+                services.AddSingleton<IBookwormService, BookwormService>();
             })
             .Build();
 
-        var bookwormService = host.Services.GetRequiredService<BookwormService>();
+        var bookwormService = host.Services.GetRequiredService<IBookwormService>();
 
         rootCmd.AddCommand(new AddCommand(bookwormService, "add", "Add a new book to store"));
         rootCmd.AddCommand(new ListCommand(bookwormService, "list", "List all books from store"));

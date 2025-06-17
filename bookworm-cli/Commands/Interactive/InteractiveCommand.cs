@@ -3,6 +3,7 @@ using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using bookworm_cli;
 using Serilog;
+using Services;
 using Spectre.Console;
 
 namespace Commands.Interactive;
@@ -10,8 +11,8 @@ namespace Commands.Interactive;
 public class InteractiveCommand
     : Command
 {
-    private readonly BookwormService _bookwormService;
-    public InteractiveCommand(BookwormService bookwormService, string name, string? description = null)
+    private readonly IBookwormService _bookwormService;
+    public InteractiveCommand(IBookwormService bookwormService, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;

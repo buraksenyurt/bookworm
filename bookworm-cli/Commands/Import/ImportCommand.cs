@@ -3,13 +3,14 @@ using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using bookworm_cli;
 using Serilog;
+using Services;
 
 namespace Commands.Import;
 
 public class ImportCommand
     : Command
 {
-    private readonly BookwormService _bookwormService;
+    private readonly IBookwormService _bookwormService;
     private Option<string> importFileOption = new(
             ["--file", "-f"],
             "The file path to import books from json format"
@@ -18,7 +19,7 @@ public class ImportCommand
         IsRequired = true,
     };
 
-    public ImportCommand(BookwormService bookwormService, string name, string? description = null)
+    public ImportCommand(IBookwormService bookwormService, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;

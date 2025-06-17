@@ -3,14 +3,15 @@ using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using bookworm_cli;
 using Serilog;
+using Services;
 
 namespace Commands.Book;
 
 public class ListCommand
     : Command
 {
-    private readonly BookwormService _bookwormService;
-    public ListCommand(BookwormService bookwormService, string name, string? description = null)
+    private readonly IBookwormService _bookwormService;
+    public ListCommand(IBookwormService bookwormService, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;

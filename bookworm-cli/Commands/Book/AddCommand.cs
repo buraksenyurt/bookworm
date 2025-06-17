@@ -3,12 +3,14 @@ using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using bookworm_cli;
 using Serilog;
+using Services;
 
 namespace Commands.Book;
 
-public class AddCommand : Command
+public class AddCommand
+    : Command
 {
-    private readonly BookwormService _bookwormService;
+    private readonly IBookwormService _bookwormService;
     private Option<string> titleOption = new(
             ["--title", "-t"],
             "The title of the book to add"
@@ -56,7 +58,7 @@ public class AddCommand : Command
         readOption.SetDefaultValue(false);
     }
 
-    public AddCommand(BookwormService bookwormService, string name, string? description = null)
+    public AddCommand(IBookwormService bookwormService, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;

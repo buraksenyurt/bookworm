@@ -3,18 +3,19 @@ using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using bookworm_cli;
 using Serilog;
+using Services;
 
 namespace Commands.Book;
 
 public class RemoveCommand
     : Command
 {
-    private readonly BookwormService _bookwormService;
+    private readonly IBookwormService _bookwormService;
     private Option<string> titleOption = new(
             ["--title", "-t"],
             "The title of the book to remove"
         );
-    public RemoveCommand(BookwormService bookwormService, string name, string? description = null)
+    public RemoveCommand(IBookwormService bookwormService, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;

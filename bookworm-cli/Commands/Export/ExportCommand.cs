@@ -3,13 +3,14 @@ using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using bookworm_cli;
 using Serilog;
+using Services;
 
 namespace Commands.Export;
 
 public class ExportCommand
     : Command
 {
-    private readonly BookwormService _bookwormService;
+    private readonly IBookwormService _bookwormService;
     private Option<string> exportFileOption = new(
             ["--file", "-f"],
             "The file path to export the books to json format (default is 'books.json')"
@@ -35,7 +36,7 @@ public class ExportCommand
             }
         });
     }
-    public ExportCommand(BookwormService bookwormService, string name, string? description = null)
+    public ExportCommand(IBookwormService bookwormService, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
