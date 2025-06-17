@@ -5,7 +5,7 @@ using Serilog;
 
 namespace Services;
 
-public class BookwormService(IBookwormApiClient apiClient) 
+public class BookwormService(IBookwormApiClient apiClient)
     : IBookwormService
 {
     public async Task<bool> AddBookAsync(string title, string category, bool read, CancellationToken cancellationToken)
@@ -27,23 +27,24 @@ public class BookwormService(IBookwormApiClient apiClient)
 
     public async Task<bool> RemoveBookAsync(string title, CancellationToken cancellationToken)
     {
-        return await apiClient.RemoveAsync(title, cancellationToken);        
+        return await apiClient.RemoveAsync(title, cancellationToken);
     }
 
-    public async Task ExportBooksAsync(string fileName, CancellationToken cancellationToken)
+    public async Task<int> ExportBooksAsync(string fileName, CancellationToken cancellationToken)
     {
         var books = await apiClient.GetAllAsync(cancellationToken);
         if (!books.Any())
         {
             Log.Information("There is no books in store for exporting");
             Helper.ShowMessage(MessageType.Warning, ["There is no books in store for exporting"]);
-            return;
+            return byte.MinValue;
         }
         var json = JsonSerializer.Serialize(books);
         await File.WriteAllTextAsync(fileName, json, cancellationToken);
+        return books.Count();
     }
 
-    public async Task ImportBooksAsync(string fileName, CancellationToken cancellationToken)
+    public async Task<int> ImportBooksAsync(string fileName, CancellationToken cancellationToken)
     {
         var json = await File.ReadAllTextAsync(fileName, cancellationToken);
         var importedBooks = JsonSerializer.Deserialize<List<Book>>(json);
@@ -52,12 +53,16 @@ public class BookwormService(IBookwormApiClient apiClient)
         {
             Log.Warning("No books found in the file '{FileName}'.", fileName);
             Helper.ShowMessage(MessageType.Warning, ["No books found in the file."]);
-            return;
+            return byte.MinValue;
         }
-
+        var importedCounter = 0;
         foreach (var book in importedBooks)
         {
-            await AddBookAsync(book.Title, book.Category, book.Read, cancellationToken);
+            if (await AddBookAsync(book.Title, book.Category, book.Read, cancellationToken))
+            {
+                importedCounter++;
+            }
         }
+        return importedCounter;
     }
 }

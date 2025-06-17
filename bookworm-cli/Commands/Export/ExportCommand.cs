@@ -55,9 +55,17 @@ public class ExportCommand
     {
         try
         {
-            await _bookwormService.ExportBooksAsync(filePath, cancellationToken);
-            Log.Information("Books exported successfully to {FilePath}.", filePath);
-            Helper.ShowMessage(MessageType.Info, ["Books exported successfully."]);
+            var result = await _bookwormService.ExportBooksAsync(filePath, cancellationToken);
+            if (result > 0)
+            {
+                Log.Information("Books exported successfully to {filePath}.", filePath);
+                Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+            }
+            else
+            {
+                Log.Warning("No books could be exported.");
+                Helper.ShowMessage(MessageType.Warning, ["No books could be exported."]);
+            }
         }
         catch (Exception ex)
         {

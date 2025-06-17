@@ -150,9 +150,17 @@ public class InteractiveCommand
                     );
                     try
                     {
-                        await _bookwormService.ExportBooksAsync(outputFile, cancellationToken);
-                        Log.Information("Books exported successfully to {outputFile}.", outputFile);
-                        Helper.ShowMessage(MessageType.Info, ["Books exported successfully."]);
+                        var result = await _bookwormService.ExportBooksAsync(outputFile, cancellationToken);
+                        if (result > 0)
+                        {
+                            Log.Information("Books exported successfully to {outputFile}.", outputFile);
+                            Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+                        }
+                        else
+                        {
+                            Log.Warning("No books could be exported.");
+                            Helper.ShowMessage(MessageType.Warning, ["No books could be exported."]);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -167,9 +175,17 @@ public class InteractiveCommand
                        );
                     try
                     {
-                        await _bookwormService.ImportBooksAsync(inputFile, cancellationToken);
-                        Log.Information("Books imported successfully from {inputFile}.", inputFile);
-                        Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+                        var result = await _bookwormService.ImportBooksAsync(inputFile, cancellationToken);
+                        if (result > 0)
+                        {
+                            Log.Information($"'{result}' books imported successfully from {inputFile}.");
+                            Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+                        }
+                        else
+                        {
+                            Log.Warning("No books could be added.");
+                            Helper.ShowMessage(MessageType.Warning, ["No books imported successfully."]);
+                        }
                     }
                     catch (Exception ex)
                     {

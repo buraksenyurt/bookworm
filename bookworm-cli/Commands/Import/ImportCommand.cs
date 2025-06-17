@@ -40,9 +40,17 @@ public class ImportCommand
     {
         try
         {
-            await _bookwormService.ImportBooksAsync(filePath, cancellationToken);
-            Log.Information("Books imported successfully from {FilePath}.", filePath);
-            Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+            var result = await _bookwormService.ImportBooksAsync(filePath, cancellationToken);
+            if (result > 0)
+            {
+                Log.Information($"'{result}' books imported successfully from {filePath}.");
+                Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+            }
+            else
+            {
+                Log.Warning("No books could be added.");
+                Helper.ShowMessage(MessageType.Warning, ["No books could be added."]);
+            }
         }
         catch (Exception ex)
         {
