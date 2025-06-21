@@ -44,7 +44,7 @@ public class ImportCommand
             if (result > 0)
             {
                 Log.Information($"'{result}' books imported successfully from {filePath}.");
-                Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+                Helper.ShowMessage(MessageType.Info, [result.ToString(), "Books imported successfully."]);
             }
             else
             {
