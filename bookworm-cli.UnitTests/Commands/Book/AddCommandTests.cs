@@ -8,12 +8,15 @@ namespace bookworm_cli.UnitTests.Commands.Book;
 public class AddCommandTests
 {
     private readonly Mock<IBookwormService> _bookwormServiceMock;
+    private readonly Mock<IMessageWriter> _messageWriterMock;
     private readonly AddCommand _command;
 
     public AddCommandTests()
     {
         _bookwormServiceMock = new Mock<IBookwormService>();
-        _command = new AddCommand(_bookwormServiceMock.Object, "add", "Add a new book");
+        _messageWriterMock = new Mock<IMessageWriter>();
+
+        _command = new AddCommand(_bookwormServiceMock.Object, _messageWriterMock.Object, "add", "Add a new book");
     }
 
     [Fact]

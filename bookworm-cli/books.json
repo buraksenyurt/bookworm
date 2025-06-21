@@ -1,1 +1,7 @@
-[{"Title":"Tutunamayanlar","Category":"Romance","Read":true},{"Title":"Fahrenheit 451","Category":"Fiction","Read":false},{"Title":"Programming with Rust","Category":"Technical-Books","Read":false},{"Title":"Algorithmic Thinking","Category":"Technical-Books","Read":true}]
+[
+  {
+    "Title": "AntiPatterns",
+    "Category": "Technical-Books",
+    "Read": true
+  }
+]

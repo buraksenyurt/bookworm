@@ -8,12 +8,15 @@ namespace bookworm_cli.UnitTests.Commands.Book;
 public class ListCommandTests
 {
     private readonly Mock<IBookwormService> _bookwormServiceMock;
+    private readonly Mock<IMessageWriter> _messageWriterMock;
+
     private readonly ListCommand _command;
 
     public ListCommandTests()
     {
         _bookwormServiceMock = new Mock<IBookwormService>();
-        _command = new ListCommand(_bookwormServiceMock.Object, "list", "List of books");
+        _messageWriterMock = new Mock<IMessageWriter>();
+        _command = new ListCommand(_bookwormServiceMock.Object, _messageWriterMock.Object, "list", "List of books");
     }
     [Fact]
     public async Task ShouldPrintBooks_WhenBooksAreReturedFromService()
@@ -35,17 +38,17 @@ public class ListCommandTests
             .Setup(s => s.GetAllBooksAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(books);
 
-        using var consoleOutput = new StringWriter();
-        Console.SetOut(consoleOutput);
-
         var _ = await _command.InvokeAsync("");
 
-        var output = consoleOutput.ToString();
-        Assert.Contains("Programming With C#", output);
-        Assert.Contains("Denizler Altında Yirmibin Fersah", output);
+        _messageWriterMock
+            .Verify(m => m.ShowMessage(
+                MessageType.Info,
+                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "2", "Books found." }))),
+                Times.Once);
+
     }
 
-    [Fact(Skip = "Should be work on CI")]
+    [Fact]
     public async Task ShouldPrintNoBooks_WhenBooksAreReturedEmptyFromService()
     {
         var noBooks = new List<bookworm_cli.Book>();
@@ -53,12 +56,13 @@ public class ListCommandTests
             .Setup(s => s.GetAllBooksAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(noBooks);
 
-        using var consoleOutput = new StringWriter();
-        Console.SetOut(consoleOutput);
 
         var _ = await _command.InvokeAsync("");
 
-        var output = consoleOutput.ToString();
-        Assert.Contains("No books found.", output);
+        _messageWriterMock
+            .Verify(m => m.ShowMessage(
+                MessageType.Warning,
+                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "No books found." }))),
+                Times.Once);
     }
 }

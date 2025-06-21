@@ -29,6 +29,7 @@ public class ListCommand
         var books = await _bookwormService.GetAllBooksAsync(cancellationToken);
         if (books.Any())
         {
+            _messageWriter.ShowMessage(MessageType.Info, [books.Count().ToString(), "Books found."]);
             foreach (var book in books)
             {
                 var readStatus = book.Read ? "Read" : "Unread";

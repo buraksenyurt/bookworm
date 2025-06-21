@@ -8,12 +8,14 @@ namespace bookworm_cli.UnitTests.Commands.Import;
 public class ImportCommandTests
 {
     private readonly Mock<IBookwormService> _bookwormServiceMock;
+    private readonly Mock<IMessageWriter> _messageWriterMock;
     private readonly ImportCommand _command;
 
     public ImportCommandTests()
     {
         _bookwormServiceMock = new Mock<IBookwormService>();
-        _command = new ImportCommand(_bookwormServiceMock.Object, "import", "Import books from a JSON file");
+        _messageWriterMock = new Mock<IMessageWriter>();
+        _command = new ImportCommand(_bookwormServiceMock.Object, _messageWriterMock.Object, "import", "Import books from a JSON file");
     }
 
     [Fact]
@@ -34,9 +36,11 @@ public class ImportCommandTests
             Times.Once
         );
 
-        var output = consoleOutput.ToString();
-        Assert.Contains("5", output);
-        Assert.Contains("Books imported successfully", output);
+        _messageWriterMock
+            .Verify(m => m.ShowMessage(
+                MessageType.Info,
+                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "5", "Books imported successfully." }))),
+                Times.AtLeastOnce);
     }
 
     [Fact]
@@ -57,8 +61,11 @@ public class ImportCommandTests
             Times.Once
         );
 
-        var output = consoleOutput.ToString();
-        Assert.Contains("No books could be added", output);
+        _messageWriterMock
+            .Verify(m => m.ShowMessage(
+                MessageType.Warning,
+                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "No books could be added." }))),
+                Times.Once);
     }
 
     [Fact]
@@ -79,7 +86,10 @@ public class ImportCommandTests
             Times.Once
         );
 
-        var output = consoleOutput.ToString();
-        Assert.Contains("Source file not found", output);
+        _messageWriterMock
+            .Verify(m => m.ShowMessage(
+                MessageType.Error,
+                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "Source file not found" }))),
+                Times.Once);
     }
 }

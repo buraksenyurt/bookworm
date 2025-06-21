@@ -8,12 +8,14 @@ namespace bookworm_cli.UnitTests.Commands.Book;
 public class RemoveCommandTests
 {
     private readonly Mock<IBookwormService> _bookwormServiceMock;
+    private readonly Mock<IMessageWriter> _messageWriterMock;
     private readonly RemoveCommand _command;
 
     public RemoveCommandTests()
     {
         _bookwormServiceMock = new Mock<IBookwormService>();
-        _command = new RemoveCommand(_bookwormServiceMock.Object, "remove", "Remove a book from store");
+        _messageWriterMock = new Mock<IMessageWriter>();
+        _command = new RemoveCommand(_bookwormServiceMock.Object, _messageWriterMock.Object, "remove", "Remove a book from store");
     }
 
     [Fact]
