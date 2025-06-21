@@ -1,7 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
-using bookworm_cli;
 using Serilog;
 using Services;
 
@@ -11,6 +10,8 @@ public class ImportCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
+    private readonly IMessageWriter _messageWriter;
+
     private readonly Option<string> importFileOption = new(
             ["--file", "-f"],
             "The file path to import books from json format"
@@ -19,10 +20,11 @@ public class ImportCommand
         IsRequired = true,
     };
 
-    public ImportCommand(IBookwormService bookwormService, string name, string? description = null)
+    public ImportCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
+        _messageWriter = messageWriter;
 
         AddOption(importFileOption);
 
@@ -44,18 +46,18 @@ public class ImportCommand
             if (result > 0)
             {
                 Log.Information($"'{result}' books imported successfully from {filePath}.");
-                Helper.ShowMessage(MessageType.Info, [result.ToString(), "Books imported successfully."]);
+                _messageWriter.ShowMessage(MessageType.Info, [result.ToString(), "Books imported successfully."]);
             }
             else
             {
                 Log.Warning("No books could be added.");
-                Helper.ShowMessage(MessageType.Warning, ["No books could be added."]);
+                _messageWriter.ShowMessage(MessageType.Warning, ["No books could be added."]);
             }
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Error importing books from {FilePath}.", filePath);
-            Helper.ShowMessage(MessageType.Error, [ex.Message]);
+            _messageWriter.ShowMessage(MessageType.Error, [ex.Message]);
         }
     }
 }

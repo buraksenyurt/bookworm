@@ -1,7 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
-using bookworm_cli;
 using Serilog;
 using Services;
 
@@ -11,6 +10,8 @@ public class ExportCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
+    private readonly IMessageWriter _messageWriter;
+
     private readonly Option<string> exportFileOption = new(
             ["--file", "-f"],
             "The file path to export the books to json format (default is 'books.json')"
@@ -36,10 +37,11 @@ public class ExportCommand
             }
         });
     }
-    public ExportCommand(IBookwormService bookwormService, string name, string? description = null)
+    public ExportCommand(IBookwormService bookwormService,IMessageWriter messageWriter, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
+        _messageWriter = messageWriter;
 
         AddOption(exportFileOption);
         SetupOptions();
@@ -59,18 +61,18 @@ public class ExportCommand
             if (result > 0)
             {
                 Log.Information("Books exported successfully to {filePath}.", filePath);
-                Helper.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+                _messageWriter.ShowMessage(MessageType.Info, ["Books imported successfully."]);
             }
             else
             {
                 Log.Warning("No books could be exported.");
-                Helper.ShowMessage(MessageType.Warning, ["No books could be exported."]);
+                _messageWriter.ShowMessage(MessageType.Warning, ["No books could be exported."]);
             }
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Error exporting books to {FilePath}.", filePath);
-            Helper.ShowMessage(MessageType.Error, [ex.Message]);
+            _messageWriter.ShowMessage(MessageType.Error, [ex.Message]);
         }
     }
 }

@@ -11,6 +11,8 @@ public class AddCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
+    private readonly IMessageWriter _messageWriter;
+
     private readonly Option<string> titleOption = new(
             ["--title", "-t"],
             "The title of the book to add"
@@ -58,10 +60,11 @@ public class AddCommand
         readOption.SetDefaultValue(false);
     }
 
-    public AddCommand(IBookwormService bookwormService, string name, string? description = null)
+    public AddCommand(IBookwormService bookwormService,IMessageWriter messageWriter, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
+        _messageWriter = messageWriter;
 
         AddOption(titleOption);
         AddOption(categoryOption);
@@ -81,14 +84,14 @@ public class AddCommand
         if (string.IsNullOrWhiteSpace(title))
         {
             Log.Error("Title cannot be null or empty.");
-            Helper.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
+            _messageWriter.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
             return;
         }
 
         if (title.Length > 50)
         {
             Log.Error("Title cannot exceed 50 characters.");
-            Helper.ShowMessage(MessageType.Error, ["Title cannot exceed 50 characters."]);
+            _messageWriter.ShowMessage(MessageType.Error, ["Title cannot exceed 50 characters."]);
             return;
         }
 
@@ -99,12 +102,12 @@ public class AddCommand
             if (result)
             {
                 Log.Information("Book '{Title}' added successfully.", title);
-                Helper.ShowMessage(MessageType.Info, ["Book added successfully."]);
+                _messageWriter.ShowMessage(MessageType.Info, ["Book added successfully."]);
             }
             else
             {
                 Log.Warning("Book '{Title}' could not be added.", title);
-                Helper.ShowMessage(MessageType.Warning, ["Book could not be added."]);
+                _messageWriter.ShowMessage(MessageType.Warning, ["Book could not be added."]);
             }
         }
         catch (Exception ex)

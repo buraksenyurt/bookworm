@@ -1,10 +1,11 @@
 using Spectre.Console;
 
-namespace bookworm_cli;
+namespace Services;
 
-public static class Helper
+public class ConsoleWriter
+    :IMessageWriter
 {
-    public static void ShowMessage(MessageType messageType, string[] messages)
+    public void ShowMessage(MessageType messageType, string[] messages)
     {
         if (messages == null || messages.Length == 0)
             return;

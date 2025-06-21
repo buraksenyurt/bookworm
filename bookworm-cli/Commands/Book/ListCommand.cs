@@ -1,7 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
-using bookworm_cli;
 using Serilog;
 using Services;
 
@@ -11,10 +10,12 @@ public class ListCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    public ListCommand(IBookwormService bookwormService, string name, string? description = null)
+    private readonly IMessageWriter _messageWriter;
+    public ListCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
+        _messageWriter = messageWriter;
 
         Handler = CommandHandler.Create<InvocationContext>(
         async ctx =>
@@ -37,7 +38,7 @@ public class ListCommand
         else
         {
             Log.Information("No books found.");
-            Helper.ShowMessage(MessageType.Warning, ["No books found."]);
+            _messageWriter.ShowMessage(MessageType.Warning, ["No books found."]);
         }
     }
 }
