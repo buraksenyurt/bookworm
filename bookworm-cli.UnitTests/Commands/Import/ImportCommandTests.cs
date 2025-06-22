@@ -26,9 +26,6 @@ public class ImportCommandTests
             s => s.ImportBooksAsync(filePath, It.IsAny<CancellationToken>())
         ).ReturnsAsync(5);
 
-        using var consoleOutput = new StringWriter();
-        Console.SetOut(consoleOutput);
-
         var result = await _command.InvokeAsync($"--file \"{filePath}\"");
 
         _bookwormServiceMock.Verify(
@@ -40,7 +37,7 @@ public class ImportCommandTests
             .Verify(m => m.ShowMessage(
                 MessageType.Info,
                 It.Is<string[]>(arr => arr.SequenceEqual(new[] { "5", Messages.ImportCommandMessages.ImportSuccessfully }))),
-                Times.AtLeastOnce);
+                Times.Once);
     }
 
     [Fact]
@@ -50,9 +47,6 @@ public class ImportCommandTests
         _bookwormServiceMock.Setup(
             s => s.ImportBooksAsync(filePath, It.IsAny<CancellationToken>())
         ).ReturnsAsync(0);
-
-        using var consoleOutput = new StringWriter();
-        Console.SetOut(consoleOutput);
 
         var result = await _command.InvokeAsync($"--file \"{filePath}\"");
 
@@ -75,9 +69,6 @@ public class ImportCommandTests
         _bookwormServiceMock.Setup(
             s => s.ImportBooksAsync(filePath, It.IsAny<CancellationToken>())
         ).ThrowsAsync(new FileNotFoundException("Source file not found"));
-
-        using var consoleOutput = new StringWriter();
-        Console.SetOut(consoleOutput);
 
         var result = await _command.InvokeAsync($"--file \"{filePath}\"");
 
