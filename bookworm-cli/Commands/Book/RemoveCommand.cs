@@ -11,17 +11,17 @@ public class RemoveCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private readonly IMessageWriter _messageWriter;
+    private readonly INotifier _notifier;
 
     private readonly Option<string> titleOption = new(
             ["--title", "-t"],
             "The title of the book to remove"
         );
-    public RemoveCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
+    public RemoveCommand(IBookwormService bookwormService, INotifier notifier, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
-        _messageWriter = messageWriter;
+        _notifier = notifier;
 
         AddOption(titleOption);
 
@@ -37,7 +37,7 @@ public class RemoveCommand
         if (string.IsNullOrWhiteSpace(title))
         {
             Log.Error(Messages.ValidationMessages.TitleCannotBeEmpty);
-            _messageWriter.ShowMessage(MessageType.Error, [Messages.ValidationMessages.TitleCannotBeEmpty]);
+            _notifier.ShowMessage(MessageType.Error, [Messages.ValidationMessages.TitleCannotBeEmpty]);
             return;
         }
 
@@ -48,12 +48,12 @@ public class RemoveCommand
             if (result)
             {
                 Log.Information("Book '{Title}' removed successfully.", title);
-                _messageWriter.ShowMessage(MessageType.Info, [Messages.RemoveCommandMessages.BookRemovedSuccessfully]);
+                _notifier.ShowMessage(MessageType.Info, [Messages.RemoveCommandMessages.BookRemovedSuccessfully]);
             }
             else
             {
                 Log.Warning("Book '{Title}' could not be removed.", title);
-                _messageWriter.ShowMessage(MessageType.Warning, [Messages.RemoveCommandMessages.BookRemovedSuccessfully]);
+                _notifier.ShowMessage(MessageType.Warning, [Messages.RemoveCommandMessages.BookRemovedSuccessfully]);
             }
         }
         catch (Exception ex)

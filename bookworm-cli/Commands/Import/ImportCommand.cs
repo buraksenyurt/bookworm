@@ -11,7 +11,7 @@ public class ImportCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private readonly IMessageWriter _messageWriter;
+    private readonly INotifier _notifier;
 
     private readonly Option<string> importFileOption = new(
             ["--file", "-f"],
@@ -21,11 +21,11 @@ public class ImportCommand
         IsRequired = true,
     };
 
-    public ImportCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
+    public ImportCommand(IBookwormService bookwormService, INotifier notifier, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
-        _messageWriter = messageWriter;
+        _notifier = notifier;
 
         AddOption(importFileOption);
 
@@ -47,18 +47,18 @@ public class ImportCommand
             if (result > 0)
             {
                 Log.Information($"'{result}' books imported successfully from {filePath}.");
-                _messageWriter.ShowMessage(MessageType.Info, [result.ToString(), Messages.ImportCommandMessages.ImportSuccessfully]);
+                _notifier.ShowMessage(MessageType.Info, [result.ToString(), Messages.ImportCommandMessages.ImportSuccessfully]);
             }
             else
             {
                 Log.Warning(Messages.ImportCommandMessages.NoBooksAdded);
-                _messageWriter.ShowMessage(MessageType.Warning, [Messages.ImportCommandMessages.NoBooksAdded]);
+                _notifier.ShowMessage(MessageType.Warning, [Messages.ImportCommandMessages.NoBooksAdded]);
             }
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Error importing books from {FilePath}.", filePath);
-            _messageWriter.ShowMessage(MessageType.Error, [ex.Message]);
+            _notifier.ShowMessage(MessageType.Error, [ex.Message]);
         }
     }
 }

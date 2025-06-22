@@ -8,15 +8,15 @@ namespace bookworm_cli.UnitTests.Commands.Book;
 public class ListCommandTests
 {
     private readonly Mock<IBookwormService> _bookwormServiceMock;
-    private readonly Mock<IMessageWriter> _messageWriterMock;
+    private readonly Mock<INotifier> _notifierMock;
 
     private readonly ListCommand _command;
 
     public ListCommandTests()
     {
         _bookwormServiceMock = new Mock<IBookwormService>();
-        _messageWriterMock = new Mock<IMessageWriter>();
-        _command = new ListCommand(_bookwormServiceMock.Object, _messageWriterMock.Object, "list", "List of books");
+        _notifierMock = new Mock<INotifier>();
+        _command = new ListCommand(_bookwormServiceMock.Object, _notifierMock.Object, "list", "List of books");
     }
     [Fact]
     public async Task ShouldPrintBooks_WhenBooksAreReturedFromService()
@@ -40,7 +40,7 @@ public class ListCommandTests
 
         var _ = await _command.InvokeAsync("");
 
-        _messageWriterMock
+        _notifierMock
             .Verify(m => m.ShowMessage(
                 MessageType.Info,
                 It.Is<string[]>(arr => arr.SequenceEqual(new[] { "2", Messages.ListCommandMessages.BooksFound }))),
@@ -59,7 +59,7 @@ public class ListCommandTests
 
         var _ = await _command.InvokeAsync("");
 
-        _messageWriterMock
+        _notifierMock
             .Verify(m => m.ShowMessage(
                 MessageType.Warning,
                 It.Is<string[]>(arr => arr.SequenceEqual(new[] { Messages.ListCommandMessages.NoBooksFound }))),

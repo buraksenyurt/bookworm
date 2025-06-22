@@ -2,8 +2,8 @@ using Spectre.Console;
 
 namespace Services;
 
-public class ConsoleWriter
-    :IMessageWriter
+public class SpectreNotifier
+    :INotifier
 {
     public void ShowMessage(MessageType messageType, string[] messages)
     {

@@ -11,7 +11,7 @@ public class ExportCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private readonly IMessageWriter _messageWriter;
+    private readonly INotifier _notifier;
 
     private readonly Option<string> exportFileOption = new(
             ["--file", "-f"],
@@ -38,11 +38,11 @@ public class ExportCommand
             }
         });
     }
-    public ExportCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
+    public ExportCommand(IBookwormService bookwormService, INotifier notifier, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
-        _messageWriter = messageWriter;
+        _notifier = notifier;
 
         AddOption(exportFileOption);
         SetupOptions();
@@ -62,18 +62,18 @@ public class ExportCommand
             if (result > 0)
             {
                 Log.Information("Books exported successfully to {filePath}.", filePath);
-                _messageWriter.ShowMessage(MessageType.Info, [Messages.ExportCommandMessages.ExportedToFile]);
+                _notifier.ShowMessage(MessageType.Info, [Messages.ExportCommandMessages.ExportedToFile]);
             }
             else
             {
                 Log.Warning(Messages.ExportCommandMessages.NoBooksExported);
-                _messageWriter.ShowMessage(MessageType.Warning, [Messages.ExportCommandMessages.NoBooksExported]);
+                _notifier.ShowMessage(MessageType.Warning, [Messages.ExportCommandMessages.NoBooksExported]);
             }
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Error exporting books to {FilePath}.", filePath);
-            _messageWriter.ShowMessage(MessageType.Error, [ex.Message]);
+            _notifier.ShowMessage(MessageType.Error, [ex.Message]);
         }
     }
 }

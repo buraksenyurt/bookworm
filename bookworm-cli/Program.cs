@@ -35,19 +35,19 @@ class Program
                     client.BaseAddress = new Uri(apiBaseAddress);
                 });
                 services.AddSingleton<IBookwormService, BookwormService>();
-                services.AddSingleton<IMessageWriter, ConsoleWriter>();
+                services.AddSingleton<INotifier, SpectreNotifier>();
             })
             .Build();
 
         var bookwormService = host.Services.GetRequiredService<IBookwormService>();
-        var messageWriter = host.Services.GetRequiredService<IMessageWriter>();
+        var notifier = host.Services.GetRequiredService<INotifier>();
 
-        rootCmd.AddCommand(new AddCommand(bookwormService, messageWriter, "add", "Add a new book to store"));
-        rootCmd.AddCommand(new ListCommand(bookwormService, messageWriter, "list", "List all books from store"));
-        rootCmd.AddCommand(new RemoveCommand(bookwormService, messageWriter, "remove", "Remove a book from store"));
-        rootCmd.AddCommand(new ExportCommand(bookwormService, messageWriter,"export", "Export books to a file (default:books.json)"));
-        rootCmd.AddCommand(new ImportCommand(bookwormService, messageWriter, "import", "Import books from file (default:books.json)"));
-        rootCmd.AddCommand(new InteractiveCommand(bookwormService, messageWriter, "interactive", "Manage book store interactively"));
+        rootCmd.AddCommand(new AddCommand(bookwormService, notifier, "add", "Add a new book to store"));
+        rootCmd.AddCommand(new ListCommand(bookwormService, notifier, "list", "List all books from store"));
+        rootCmd.AddCommand(new RemoveCommand(bookwormService, notifier, "remove", "Remove a book from store"));
+        rootCmd.AddCommand(new ExportCommand(bookwormService, notifier,"export", "Export books to a file (default:books.json)"));
+        rootCmd.AddCommand(new ImportCommand(bookwormService, notifier, "import", "Import books from file (default:books.json)"));
+        rootCmd.AddCommand(new InteractiveCommand(bookwormService, notifier, "interactive", "Manage book store interactively"));
 
         // Parser
         var parser = new CommandLineBuilder(rootCmd)

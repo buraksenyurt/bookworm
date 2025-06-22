@@ -5,7 +5,7 @@ using Serilog;
 
 namespace Services;
 
-public class BookwormService(IBookwormApiClient apiClient, IMessageWriter messageWriter)
+public class BookwormService(IBookwormApiClient apiClient, INotifier notifier)
     : IBookwormService
 {
     public async Task<bool> AddBookAsync(string title, string category, bool read, CancellationToken cancellationToken)
@@ -36,7 +36,7 @@ public class BookwormService(IBookwormApiClient apiClient, IMessageWriter messag
         if (!books.Any())
         {
             Log.Information(Messages.ExportCommandMessages.ThereIsNoBooksToExport);
-            messageWriter.ShowMessage(MessageType.Warning, [Messages.ExportCommandMessages.ThereIsNoBooksToExport]);
+            notifier.ShowMessage(MessageType.Warning, [Messages.ExportCommandMessages.ThereIsNoBooksToExport]);
             return byte.MinValue;
         }
         var json = JsonSerializer.Serialize(books);
@@ -52,7 +52,7 @@ public class BookwormService(IBookwormApiClient apiClient, IMessageWriter messag
         if (importedBooks == null || importedBooks.Count == 0)
         {
             Log.Warning("{NoBooks} '{FileName}'.", Messages.ImportCommandMessages.NoBooksFoundInFile, fileName);
-            messageWriter.ShowMessage(MessageType.Warning, [Messages.ImportCommandMessages.NoBooksFoundInFile]);
+            notifier.ShowMessage(MessageType.Warning, [Messages.ImportCommandMessages.NoBooksFoundInFile]);
             return byte.MinValue;
         }
         var importedCounter = 0;

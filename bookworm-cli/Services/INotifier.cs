@@ -1,6 +1,6 @@
 ﻿namespace Services;
 
-public interface IMessageWriter
+public interface INotifier
 {
     void ShowMessage(MessageType messageType, string[] messages);
 }

@@ -11,7 +11,7 @@ public class AddCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private readonly IMessageWriter _messageWriter;
+    private readonly INotifier _notifier;
 
     private readonly Option<string> titleOption = new(
             ["--title", "-t"],
@@ -60,11 +60,11 @@ public class AddCommand
         readOption.SetDefaultValue(false);
     }
 
-    public AddCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
+    public AddCommand(IBookwormService bookwormService, INotifier notifier, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
-        _messageWriter = messageWriter;
+        _notifier = notifier;
 
         AddOption(titleOption);
         AddOption(categoryOption);
@@ -84,14 +84,14 @@ public class AddCommand
         if (string.IsNullOrWhiteSpace(title))
         {
             Log.Error(Messages.ValidationMessages.TitleCannotBeEmpty);
-            _messageWriter.ShowMessage(MessageType.Error, [Messages.ValidationMessages.TitleCannotBeEmpty]);
+            _notifier.ShowMessage(MessageType.Error, [Messages.ValidationMessages.TitleCannotBeEmpty]);
             return;
         }
 
         if (title.Length > 50)
         {
             Log.Error(Messages.ValidationMessages.TitleExceedsMaxLength);
-            _messageWriter.ShowMessage(MessageType.Error, [Messages.ValidationMessages.TitleExceedsMaxLength]);
+            _notifier.ShowMessage(MessageType.Error, [Messages.ValidationMessages.TitleExceedsMaxLength]);
             return;
         }
 
@@ -102,12 +102,12 @@ public class AddCommand
             if (result)
             {
                 Log.Information("Book '{Title}' added successfully.", title);
-                _messageWriter.ShowMessage(MessageType.Info, [Messages.AddCommandMessages.BookAddedSuccessfully]);
+                _notifier.ShowMessage(MessageType.Info, [Messages.AddCommandMessages.BookAddedSuccessfully]);
             }
             else
             {
                 Log.Warning("Book '{Title}' could not be added.", title);
-                _messageWriter.ShowMessage(MessageType.Warning, [Messages.AddCommandMessages.BookCouldNotBeAdded]);
+                _notifier.ShowMessage(MessageType.Warning, [Messages.AddCommandMessages.BookCouldNotBeAdded]);
             }
         }
         catch (Exception ex)

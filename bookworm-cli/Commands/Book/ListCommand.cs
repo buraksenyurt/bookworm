@@ -11,12 +11,12 @@ public class ListCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private readonly IMessageWriter _messageWriter;
-    public ListCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
+    private readonly INotifier _notifier;
+    public ListCommand(IBookwormService bookwormService, INotifier notifier, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
-        _messageWriter = messageWriter;
+        _notifier = notifier;
 
         Handler = CommandHandler.Create<InvocationContext>(
         async ctx =>
@@ -30,7 +30,7 @@ public class ListCommand
         var books = await _bookwormService.GetAllBooksAsync(cancellationToken);
         if (books.Any())
         {
-            _messageWriter.ShowMessage(MessageType.Info, [books.Count().ToString(), Messages.ListCommandMessages.BooksFound]);
+            _notifier.ShowMessage(MessageType.Info, [books.Count().ToString(), Messages.ListCommandMessages.BooksFound]);
             foreach (var book in books)
             {
                 var readStatus = book.Read ? "Read" : "Unread";
@@ -40,7 +40,7 @@ public class ListCommand
         else
         {
             Log.Information("No books found.");
-            _messageWriter.ShowMessage(MessageType.Warning, [Messages.ListCommandMessages.NoBooksFound]);
+            _notifier.ShowMessage(MessageType.Warning, [Messages.ListCommandMessages.NoBooksFound]);
         }
     }
 }

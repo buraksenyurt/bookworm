@@ -12,12 +12,12 @@ public class InteractiveCommand
     : Command
 {
     private readonly IBookwormService _bookwormService;
-    private readonly IMessageWriter _messageWriter;
-    public InteractiveCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
+    private readonly INotifier _notifier;
+    public InteractiveCommand(IBookwormService bookwormService, INotifier notifier, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
-        _messageWriter = messageWriter;
+        _notifier = notifier;
 
         Handler = CommandHandler.Create<InvocationContext>(
         async (ctx) =>
@@ -66,14 +66,14 @@ public class InteractiveCommand
                     if (string.IsNullOrWhiteSpace(title))
                     {
                         Log.Error("Title cannot be null or empty.");
-                        _messageWriter.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
+                        _notifier.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
                         return;
                     }
 
                     if (title.Length > 50)
                     {
                         Log.Error("Title cannot exceed 50 characters.");
-                        _messageWriter.ShowMessage(MessageType.Error, ["Title cannot exceed 50 characters."]);
+                        _notifier.ShowMessage(MessageType.Error, ["Title cannot exceed 50 characters."]);
                         return;
                     }
 
@@ -84,12 +84,12 @@ public class InteractiveCommand
                         if (result)
                         {
                             Log.Information("Book '{Title}' added successfully.", title);
-                            _messageWriter.ShowMessage(MessageType.Info, ["Book added successfully."]);
+                            _notifier.ShowMessage(MessageType.Info, ["Book added successfully."]);
                         }
                         else
                         {
                             Log.Warning("Book '{Title}' could not be added.", title);
-                            _messageWriter.ShowMessage(MessageType.Warning, ["Book could not be added."]);
+                            _notifier.ShowMessage(MessageType.Warning, ["Book could not be added."]);
                         }
                     }
                     catch (Exception ex)
@@ -105,7 +105,7 @@ public class InteractiveCommand
                     if (string.IsNullOrWhiteSpace(removeTitle))
                     {
                         Log.Error("Title cannot be null or empty.");
-                        _messageWriter.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
+                        _notifier.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
                         return;
                     }
 
@@ -115,12 +115,12 @@ public class InteractiveCommand
                         if (result)
                         {
                             Log.Information("Book '{Title}' removed successfully.", removeTitle);
-                            _messageWriter.ShowMessage(MessageType.Info, ["Book removed successfully."]);
+                            _notifier.ShowMessage(MessageType.Info, ["Book removed successfully."]);
                         }
                         else
                         {
                             Log.Warning("Book '{Title}' could not be removed.", removeTitle);
-                            _messageWriter.ShowMessage(MessageType.Warning, ["Book could not be removed."]);
+                            _notifier.ShowMessage(MessageType.Warning, ["Book could not be removed."]);
                         }
                     }
                     catch (Exception ex)
@@ -142,7 +142,7 @@ public class InteractiveCommand
                     else
                     {
                         Log.Information("No books found.");
-                        _messageWriter.ShowMessage(MessageType.Warning, ["No books found."]);
+                        _notifier.ShowMessage(MessageType.Warning, ["No books found."]);
                     }
                     break;
                 case "Export":
@@ -156,18 +156,18 @@ public class InteractiveCommand
                         if (result > 0)
                         {
                             Log.Information("Books exported successfully to {outputFile}.", outputFile);
-                            _messageWriter.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+                            _notifier.ShowMessage(MessageType.Info, ["Books imported successfully."]);
                         }
                         else
                         {
                             Log.Warning("No books could be exported.");
-                            _messageWriter.ShowMessage(MessageType.Warning, ["No books could be exported."]);
+                            _notifier.ShowMessage(MessageType.Warning, ["No books could be exported."]);
                         }
                     }
                     catch (Exception ex)
                     {
                         Log.Error(ex, "Error exporting books to {outputFile}.", outputFile);
-                        _messageWriter.ShowMessage(MessageType.Error, [ex.Message]);
+                        _notifier.ShowMessage(MessageType.Error, [ex.Message]);
                     }
                     break;
                 case "Import":
@@ -181,18 +181,18 @@ public class InteractiveCommand
                         if (result > 0)
                         {
                             Log.Information($"'{result}' books imported successfully from {inputFile}.");
-                            _messageWriter.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+                            _notifier.ShowMessage(MessageType.Info, ["Books imported successfully."]);
                         }
                         else
                         {
                             Log.Warning("No books could be added.");
-                            _messageWriter.ShowMessage(MessageType.Warning, ["No books imported successfully."]);
+                            _notifier.ShowMessage(MessageType.Warning, ["No books imported successfully."]);
                         }
                     }
                     catch (Exception ex)
                     {
                         Log.Error(ex, "Error importing books from {inputFile}.", inputFile);
-                        _messageWriter.ShowMessage(MessageType.Error, [ex.Message]);
+                        _notifier.ShowMessage(MessageType.Error, [ex.Message]);
                     }
                     break;
                 case "Exit":

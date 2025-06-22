@@ -8,14 +8,14 @@ namespace bookworm_cli.UnitTests.Commands.Export;
 public class ExportCommandTests
 {
     private readonly Mock<IBookwormService> _bookwormServiceMock;
-    private readonly Mock<IMessageWriter> _messageWriterMock;
+    private readonly Mock<INotifier> _notifierMock;
     private readonly ExportCommand _command;
 
     public ExportCommandTests()
     {
         _bookwormServiceMock = new Mock<IBookwormService>();
-        _messageWriterMock = new Mock<IMessageWriter>();
-        _command = new ExportCommand(_bookwormServiceMock.Object, _messageWriterMock.Object, "export", "Export books to a JSON file (default:book.json)");
+        _notifierMock = new Mock<INotifier>();
+        _command = new ExportCommand(_bookwormServiceMock.Object, _notifierMock.Object, "export", "Export books to a JSON file (default:book.json)");
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class ExportCommandTests
             Times.Once
         );
 
-        _messageWriterMock
+        _notifierMock
             .Verify(m => m.ShowMessage(
                 MessageType.Info,
                 It.Is<string[]>(arr => arr.SequenceEqual(new[] { Messages.ExportCommandMessages.ExportedToFile }))),
@@ -55,7 +55,7 @@ public class ExportCommandTests
             Times.Once
         );
 
-        _messageWriterMock
+        _notifierMock
             .Verify(m => m.ShowMessage(
                 MessageType.Warning,
                 It.Is<string[]>(arr => arr.SequenceEqual(new[] { Messages.ExportCommandMessages.NoBooksExported }))),
@@ -77,7 +77,7 @@ public class ExportCommandTests
             Times.Once
         );
 
-        _messageWriterMock
+        _notifierMock
             .Verify(m => m.ShowMessage(
                 MessageType.Error,
                 It.Is<string[]>(arr => arr.SequenceEqual(new[] { "Source file not found" }))),
