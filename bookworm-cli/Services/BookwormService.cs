@@ -5,7 +5,7 @@ using Serilog;
 
 namespace Services;
 
-public class BookwormService(IBookwormApiClient apiClient,IMessageWriter messageWriter)
+public class BookwormService(IBookwormApiClient apiClient, IMessageWriter messageWriter)
     : IBookwormService
 {
     public async Task<bool> AddBookAsync(string title, string category, bool read, CancellationToken cancellationToken)
@@ -35,8 +35,8 @@ public class BookwormService(IBookwormApiClient apiClient,IMessageWriter message
         var books = await apiClient.GetAllAsync(cancellationToken);
         if (!books.Any())
         {
-            Log.Information("There is no books in store for exporting");
-            messageWriter.ShowMessage(MessageType.Warning, ["There is no books in store for exporting"]);
+            Log.Information(Messages.ExportCommandMessages.ThereIsNoBooksToExport);
+            messageWriter.ShowMessage(MessageType.Warning, [Messages.ExportCommandMessages.ThereIsNoBooksToExport]);
             return byte.MinValue;
         }
         var json = JsonSerializer.Serialize(books);
@@ -51,8 +51,8 @@ public class BookwormService(IBookwormApiClient apiClient,IMessageWriter message
 
         if (importedBooks == null || importedBooks.Count == 0)
         {
-            Log.Warning("No books found in the file '{FileName}'.", fileName);
-            messageWriter.ShowMessage(MessageType.Warning, ["No books found in the file."]);
+            Log.Warning("{NoBooks} '{FileName}'.", Messages.ImportCommandMessages.NoBooksFoundInFile, fileName);
+            messageWriter.ShowMessage(MessageType.Warning, [Messages.ImportCommandMessages.NoBooksFoundInFile]);
             return byte.MinValue;
         }
         var importedCounter = 0;

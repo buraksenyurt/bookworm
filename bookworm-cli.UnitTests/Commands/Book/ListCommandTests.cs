@@ -43,7 +43,7 @@ public class ListCommandTests
         _messageWriterMock
             .Verify(m => m.ShowMessage(
                 MessageType.Info,
-                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "2", "Books found." }))),
+                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "2", Messages.ListCommandMessages.BooksFound }))),
                 Times.Once);
 
     }
@@ -62,7 +62,7 @@ public class ListCommandTests
         _messageWriterMock
             .Verify(m => m.ShowMessage(
                 MessageType.Warning,
-                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "No books found." }))),
+                It.Is<string[]>(arr => arr.SequenceEqual(new[] { Messages.ListCommandMessages.NoBooksFound }))),
                 Times.Once);
     }
 }

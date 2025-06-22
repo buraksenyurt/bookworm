@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
+using bookworm_cli;
 using Serilog;
 using Services;
 
@@ -29,15 +30,15 @@ public class ExportCommand
             var filePath = result.GetValueForOption(exportFileOption);
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                result.ErrorMessage = "File path cannot be null or empty.";
+                result.ErrorMessage = Messages.ValidationMessages.FilePathCannotBeEmpty;
             }
             else if (!filePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             {
-                result.ErrorMessage = "File must have a json extension.";
+                result.ErrorMessage = Messages.ValidationMessages.FileMustHaveJsonExtension;
             }
         });
     }
-    public ExportCommand(IBookwormService bookwormService,IMessageWriter messageWriter, string name, string? description = null)
+    public ExportCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
@@ -61,12 +62,12 @@ public class ExportCommand
             if (result > 0)
             {
                 Log.Information("Books exported successfully to {filePath}.", filePath);
-                _messageWriter.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+                _messageWriter.ShowMessage(MessageType.Info, [Messages.ExportCommandMessages.ExportedToFile]);
             }
             else
             {
-                Log.Warning("No books could be exported.");
-                _messageWriter.ShowMessage(MessageType.Warning, ["No books could be exported."]);
+                Log.Warning(Messages.ExportCommandMessages.NoBooksExported);
+                _messageWriter.ShowMessage(MessageType.Warning, [Messages.ExportCommandMessages.NoBooksExported]);
             }
         }
         catch (Exception ex)

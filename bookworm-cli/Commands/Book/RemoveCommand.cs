@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
+using bookworm_cli;
 using Serilog;
 using Services;
 
@@ -16,7 +17,7 @@ public class RemoveCommand
             ["--title", "-t"],
             "The title of the book to remove"
         );
-    public RemoveCommand(IBookwormService bookwormService,IMessageWriter messageWriter, string name, string? description = null)
+    public RemoveCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
@@ -35,8 +36,8 @@ public class RemoveCommand
     {
         if (string.IsNullOrWhiteSpace(title))
         {
-            Log.Error("Title cannot be null or empty.");
-            _messageWriter.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
+            Log.Error(Messages.ValidationMessages.TitleCannotBeEmpty);
+            _messageWriter.ShowMessage(MessageType.Error, [Messages.ValidationMessages.TitleCannotBeEmpty]);
             return;
         }
 
@@ -47,12 +48,12 @@ public class RemoveCommand
             if (result)
             {
                 Log.Information("Book '{Title}' removed successfully.", title);
-                _messageWriter.ShowMessage(MessageType.Info, ["Book removed successfully."]);
+                _messageWriter.ShowMessage(MessageType.Info, [Messages.RemoveCommandMessages.BookRemovedSuccessfully]);
             }
             else
             {
                 Log.Warning("Book '{Title}' could not be removed.", title);
-                _messageWriter.ShowMessage(MessageType.Warning, ["Book could not be removed."]);
+                _messageWriter.ShowMessage(MessageType.Warning, [Messages.RemoveCommandMessages.BookRemovedSuccessfully]);
             }
         }
         catch (Exception ex)

@@ -60,7 +60,7 @@ public class AddCommand
         readOption.SetDefaultValue(false);
     }
 
-    public AddCommand(IBookwormService bookwormService,IMessageWriter messageWriter, string name, string? description = null)
+    public AddCommand(IBookwormService bookwormService, IMessageWriter messageWriter, string name, string? description = null)
         : base(name, description)
     {
         _bookwormService = bookwormService;
@@ -83,15 +83,15 @@ public class AddCommand
     {
         if (string.IsNullOrWhiteSpace(title))
         {
-            Log.Error("Title cannot be null or empty.");
-            _messageWriter.ShowMessage(MessageType.Error, ["Title cannot be null or empty."]);
+            Log.Error(Messages.ValidationMessages.TitleCannotBeEmpty);
+            _messageWriter.ShowMessage(MessageType.Error, [Messages.ValidationMessages.TitleCannotBeEmpty]);
             return;
         }
 
         if (title.Length > 50)
         {
-            Log.Error("Title cannot exceed 50 characters.");
-            _messageWriter.ShowMessage(MessageType.Error, ["Title cannot exceed 50 characters."]);
+            Log.Error(Messages.ValidationMessages.TitleExceedsMaxLength);
+            _messageWriter.ShowMessage(MessageType.Error, [Messages.ValidationMessages.TitleExceedsMaxLength]);
             return;
         }
 
@@ -102,12 +102,12 @@ public class AddCommand
             if (result)
             {
                 Log.Information("Book '{Title}' added successfully.", title);
-                _messageWriter.ShowMessage(MessageType.Info, ["Book added successfully."]);
+                _messageWriter.ShowMessage(MessageType.Info, [Messages.AddCommandMessages.BookAddedSuccessfully]);
             }
             else
             {
                 Log.Warning("Book '{Title}' could not be added.", title);
-                _messageWriter.ShowMessage(MessageType.Warning, ["Book could not be added."]);
+                _messageWriter.ShowMessage(MessageType.Warning, [Messages.AddCommandMessages.BookCouldNotBeAdded]);
             }
         }
         catch (Exception ex)

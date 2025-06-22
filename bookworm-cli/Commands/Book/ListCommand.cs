@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
+using bookworm_cli;
 using Serilog;
 using Services;
 
@@ -29,7 +30,7 @@ public class ListCommand
         var books = await _bookwormService.GetAllBooksAsync(cancellationToken);
         if (books.Any())
         {
-            _messageWriter.ShowMessage(MessageType.Info, [books.Count().ToString(), "Books found."]);
+            _messageWriter.ShowMessage(MessageType.Info, [books.Count().ToString(), Messages.ListCommandMessages.BooksFound]);
             foreach (var book in books)
             {
                 var readStatus = book.Read ? "Read" : "Unread";
@@ -39,7 +40,7 @@ public class ListCommand
         else
         {
             Log.Information("No books found.");
-            _messageWriter.ShowMessage(MessageType.Warning, ["No books found."]);
+            _messageWriter.ShowMessage(MessageType.Warning, [Messages.ListCommandMessages.NoBooksFound]);
         }
     }
 }

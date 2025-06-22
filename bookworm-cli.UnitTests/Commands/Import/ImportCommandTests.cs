@@ -39,7 +39,7 @@ public class ImportCommandTests
         _messageWriterMock
             .Verify(m => m.ShowMessage(
                 MessageType.Info,
-                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "5", "Books imported successfully." }))),
+                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "5", Messages.ImportCommandMessages.ImportSuccessfully }))),
                 Times.AtLeastOnce);
     }
 
@@ -64,7 +64,7 @@ public class ImportCommandTests
         _messageWriterMock
             .Verify(m => m.ShowMessage(
                 MessageType.Warning,
-                It.Is<string[]>(arr => arr.SequenceEqual(new[] { "No books could be added." }))),
+                It.Is<string[]>(arr => arr.SequenceEqual(new[] { Messages.ImportCommandMessages.NoBooksAdded }))),
                 Times.Once);
     }
 

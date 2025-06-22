@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
+using bookworm_cli;
 using Serilog;
 using Services;
 
@@ -46,12 +47,12 @@ public class ImportCommand
             if (result > 0)
             {
                 Log.Information($"'{result}' books imported successfully from {filePath}.");
-                _messageWriter.ShowMessage(MessageType.Info, [result.ToString(), "Books imported successfully."]);
+                _messageWriter.ShowMessage(MessageType.Info, [result.ToString(), Messages.ImportCommandMessages.ImportSuccessfully]);
             }
             else
             {
-                Log.Warning("No books could be added.");
-                _messageWriter.ShowMessage(MessageType.Warning, ["No books could be added."]);
+                Log.Warning(Messages.ImportCommandMessages.NoBooksAdded);
+                _messageWriter.ShowMessage(MessageType.Warning, [Messages.ImportCommandMessages.NoBooksAdded]);
             }
         }
         catch (Exception ex)
