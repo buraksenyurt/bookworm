@@ -156,7 +156,7 @@ public class InteractiveCommand
                         if (result > 0)
                         {
                             Log.Information("Books exported successfully to {outputFile}.", outputFile);
-                            _notifier.ShowMessage(MessageType.Info, ["Books imported successfully."]);
+                            _notifier.ShowMessage(MessageType.Info, ["Books exported successfully."]);
                         }
                         else
                         {

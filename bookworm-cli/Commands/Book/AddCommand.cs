@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
+using System.CommandLine.Parsing;
 using bookworm_cli;
 using Serilog;
 using Services;
@@ -32,6 +33,13 @@ public class AddCommand
     private readonly Option<bool> readOption = new(
             ["--read", "-r"],
             "Indicates if the book has been read (default is false)"
+        )
+    {
+        IsRequired = false,
+    };
+
+    private readonly Option<string> tokenOption = new(
+        ["--token", "-tk"], "Add a book with a user token (optional)"
         )
     {
         IsRequired = false,
@@ -69,17 +77,18 @@ public class AddCommand
         AddOption(titleOption);
         AddOption(categoryOption);
         AddOption(readOption);
+        AddOption(tokenOption);
 
-        Handler = CommandHandler.Create<string, string, bool, InvocationContext>(
-        async (title, category, read, ctx) =>
+        Handler = CommandHandler.Create<string, string, bool, string, InvocationContext>(
+        async (title, category, read, token, ctx) =>
         {
-            await OnHandleAddCommand(title, category, read, ctx.GetCancellationToken());
+            await OnHandleAddCommand(title, category, read, token, ctx.GetCancellationToken());
         });
 
         SetupOptions();
     }
 
-    private async Task OnHandleAddCommand(string title, string category, bool read, CancellationToken cancellationToken = default)
+    private async Task OnHandleAddCommand(string title, string category, bool read, string token, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -97,8 +106,21 @@ public class AddCommand
 
         try
         {
+            Guid? userToken = null;
+            if (Guid.TryParse(token, out var parsedToken))
+            {
+                userToken = parsedToken;
+            }
+            var result = false;
+            if (userToken.HasValue)
+            {
+                result = await _bookwormService.AddBookAsync(title, category, read, userToken.Value, cancellationToken);
+            }
+            else
+            {
+                result = await _bookwormService.AddBookAsync(title, category, read, cancellationToken);
+            }
 
-            var result = await _bookwormService.AddBookAsync(title, category, read, cancellationToken);
             if (result)
             {
                 Log.Information("Book '{Title}' added successfully.", title);

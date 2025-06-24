@@ -20,6 +20,18 @@ public class BookwormService(IBookwormApiClient apiClient, INotifier notifier)
         return await apiClient.AddAsync(book, cancellationToken);
     }
 
+    public async Task<bool> AddBookAsync(string title, string category, bool read, Guid accessToken, CancellationToken cancellationToken)
+    {
+        var book = new Book
+        {
+            Title = title,
+            Category = category ?? "Uncategorized",
+            Read = read
+        };
+
+        return await apiClient.AddAsync(book, accessToken, cancellationToken);
+    }
+
     public async Task<IEnumerable<Book>> GetAllBooksAsync(CancellationToken cancellationToken)
     {
         return await apiClient.GetAllAsync(cancellationToken);
