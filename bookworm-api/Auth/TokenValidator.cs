@@ -22,11 +22,7 @@ public class TokenValidator
     public bool IsValid(Guid token)
     {
         var identityToken = _tokens.FirstOrDefault(t => t.Value == token);
-        if (identityToken == null)
-        {
-            return false;
-        }
-        return !identityToken.IsExpired;
+        return identityToken != null;
     }
     public bool IsExpired(Guid token)
     {

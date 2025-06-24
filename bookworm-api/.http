@@ -14,6 +14,54 @@ Content-Type: application/json
   "read": true
 }
 
+### Add a new book (With Access Token) - Raise HTTP 400 Bad Request
+POST {{baseUrl}}/v2/books
+Content-Type: application/json
+X-Access-Token : 1234
+
+{
+  "id": 0,
+  "title": "Dune",
+  "category": "Science",
+  "read": true
+}
+
+### Add a new book (With Access Token) - Raise HTTP 401 Unauthorized - Not Valid
+POST {{baseUrl}}/v2/books
+Content-Type: application/json
+X-Access-Token : B26D062D-FC85-402B-9B15-952137F1F02A
+
+{
+  "id": 0,
+  "title": "Dune",
+  "category": "Science",
+  "read": true
+}
+
+### Add a new book (With Access Token) - Raise HTTP 401 Unauthorized - Expired
+POST {{baseUrl}}/v2/books
+Content-Type: application/json
+X-Access-Token : 3105F476-5C0F-48FA-AF47-59D0122FE4C5
+
+{
+  "id": 0,
+  "title": "Dune",
+  "category": "Science",
+  "read": true
+}
+
+### Add a new book (With Access Token) - Raise HTTP 200 Valid Token
+POST {{baseUrl}}/v2/books
+Content-Type: application/json
+X-Access-Token : 3176FF45-6719-40B0-8534-0728FDCE04E2
+
+{
+  "id": 0,
+  "title": "Dune",
+  "category": "Science",
+  "read": true
+}
+
 ### List all books
 GET {{baseUrl}}/books
 

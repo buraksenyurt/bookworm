@@ -1,6 +1,8 @@
 using bookworm_api;
+using bookworm_api.Auth;
 using bookworm_api.Repository;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Events;
 
@@ -13,6 +15,7 @@ Log.Logger = new LoggerConfiguration()
 var connStr = builder.Configuration.GetConnectionString("DbConStr") ?? "Data Source = books.db";
 Database.Initialize(connStr);
 builder.Services.AddSingleton<IBookRepository>(new BookRepository(connStr));
+builder.Services.AddScoped<ITokenValidator, TokenValidator>();
 
 var app = builder.Build();
 
@@ -37,6 +40,37 @@ app.MapGet("/", () => "Bookworms Db Store Api");
 
 app.MapPost("/books", async (BookDto dto, IBookRepository repository) =>
 {
+    var isExist = await repository.GetByTitleAsync(dto.Title);
+    if (isExist != null)
+    {
+        return Results.BadRequest(new { message = $"Book with title '{dto.Title}' already exist" });
+    }
+    var book = new Book(0, dto.Title, dto.Category, dto.Read, DateTime.UtcNow, null);
+    await repository.AddAsync(book);
+    Log.Information($"'{dto.Title}' added to deppo successfully");
+    return Results.Created($"/books", dto);
+});
+
+app.MapPost("/v2/books", async ([FromHeader(Name = "X-Access-Token")] string userToken, BookDto dto, ITokenValidator tokenValidator, IBookRepository repository, HttpContext httpContext) =>
+{
+    if (!Guid.TryParse(userToken, out var token))
+    {
+        Log.Warning("Invalid user token format");
+        return Results.BadRequest(new { message = "Invalid user token format" });
+    }
+    if (!tokenValidator.IsValid(token))
+    {
+        Log.Warning("Invalid user token");
+        httpContext!.Response.Headers["X-Invalid-Access-Token"] = token.ToString();
+        return Results.Unauthorized();
+    }
+    if (tokenValidator.IsExpired(token))
+    {
+        Log.Warning("User token is expired");
+        httpContext!.Response.Headers["X-Expired-Access-Token"] = token.ToString();
+        return Results.Unauthorized();
+    }
+
     var isExist = await repository.GetByTitleAsync(dto.Title);
     if (isExist != null)
     {
